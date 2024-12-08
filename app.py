@@ -207,7 +207,16 @@ folium.Circle(
         fill=True,
         fill_opacity=0.4
     ).add_to(default_map)
-st_folium(default_map, width=700, height=500)
+    st_folium(default_map, width=700, height=500)
+
+# Add a legend for the map
+st.markdown("""### Legend
+- **Red**: Current Location
+- **Green**: 4-5 Stars
+- **Orange**: 3-4 Stars
+- **Yellow**: 1-2 Stars
+- **Gray**: Unrated or 0-1 Stars
+""")
 
 # Show data in a table if facilities exist
 if "facilities" in st.session_state and not st.session_state["facilities"].empty:
