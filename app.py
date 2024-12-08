@@ -36,15 +36,14 @@ if "current_location_marker" not in st.session_state:
 
 def classify_issue(issue_description):
     """
-    Classify an issue description into one of the CARE_TYPES categories using OpenAI GPT (latest API).
+    Classify an issue description into one of the CARE_TYPES categories using OpenAI GPT (latest API format).
     """
     import openai
 
-    # Set your OpenAI API key
+    # Your OpenAI API key
     openai.api_key = "your-openai-api-key"
 
     try:
-        # Use the updated API
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -52,12 +51,12 @@ def classify_issue(issue_description):
                 {"role": "user", "content": issue_description}
             ]
         )
-        # Extract content from the response
-        return response['choices'][0]['message']['content'].strip()
+        # Correctly parse the response
+        return response.choices[0].message['content'].strip()
     except Exception as e:
-        # Handle errors gracefully
-        st.error(f"Error with GPT classification: {e}")
-        return "All Healthcare"
+        # Handle any errors
+        return f"Error: {e}"
+
 
 
 
