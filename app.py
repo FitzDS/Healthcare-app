@@ -165,18 +165,12 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
-            # Fetch facility information
-            rating = row['rating']
             category = row.get('category', 'healthcare')
-            
-            # Use a different icon based on category
-            icon_url = f"https://example.com/icons/{CATEGORY_ICONS.get(category, 'info-sign')}.png"  # Replace with actual icon URLs
-            custom_icon = CustomIcon(icon_url, icon_size=(30, 30))  # Adjust size as needed
+            icon_name = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
+            print(f"Category: {category}, Icon: {icon_name}")
+            marker_color = 'blue'  # Adjust color logic as needed
         
-            # Debugging (to verify which icons are being assigned)
-            print(f"Category: {category}, Assigned Icon: {icon_url}")
-        
-            # Prepare popup content
+            # Create popup content
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
@@ -184,23 +178,11 @@ if st.button("Search", key="search_button"):
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
         
-            # Determine marker color based on rating
-            if rating == 'N/A' or float(rating) <= 1:
-                marker_color = 'gray'
-            elif 1 < float(rating) <= 2:
-                marker_color = 'yellow'
-            elif 2 < float(rating) <= 3:
-                marker_color = 'orange'
-            elif 3 < float(rating) <= 4:
-                marker_color = 'blue'
-            else:
-                marker_color = 'green'
-        
-            # Add marker to map with a custom icon
+            # Add marker with folium.Icon
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=custom_icon  # Use custom icon here
+                icon=folium.Icon(icon=icon_name, color=marker_color)
             ).add_to(m)
 
 
