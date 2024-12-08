@@ -62,7 +62,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
 
-def fetch_ratings_for_existing_places(facilities_df):
+def fetch_ratings_and_open_status(facilities_df):
     updated_facilities = []
 
     for _, facility in facilities_df.iterrows():
@@ -70,7 +70,7 @@ def fetch_ratings_for_existing_places(facilities_df):
         params = {
             'input': facility['name'],
             'inputtype': 'textquery',
-            'fields': 'rating,user_ratings_total',
+            'fields': 'rating,user_ratings_total,opening_hours',
             'locationbias': f"point:{facility['latitude']},{facility['longitude']}",
             'key': GOOGLE_API_KEY
         }
@@ -83,13 +83,16 @@ def fetch_ratings_for_existing_places(facilities_df):
                 candidate = data['candidates'][0]
                 facility['rating'] = candidate.get('rating', 'N/A')
                 facility['user_ratings_total'] = candidate.get('user_ratings_total', 0)
+                facility['open_now'] = candidate.get('opening_hours', {}).get('open_now', 'N/A')
             else:
                 facility['rating'] = 'N/A'
                 facility['user_ratings_total'] = 0
+                facility['open_now'] = 'N/A'
         else:
             st.error(f"Error fetching ratings for {facility['name']}: {response.status_code}")
             facility['rating'] = 'N/A'
             facility['user_ratings_total'] = 0
+            facility['open_now'] = 'N/A'
 
         updated_facilities.append(facility)
 
@@ -137,6 +140,7 @@ latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
+show_open_only = st.checkbox("Show Open Facilities Only", value=False)
 
 if use_current_location:
     current_location = get_current_location()
@@ -162,7 +166,11 @@ if st.button("Search", key="search_button"):
         st.session_state["facilities"] = pd.DataFrame()
     else:
         st.write(f"Found {len(facilities)} facilities.")
-        facilities_with_ratings = fetch_ratings_for_existing_places(facilities)
+        facilities_with_ratings = fetch_ratings_and_open_status(facilities)
+
+        if show_open_only:
+            facilities_with_ratings = facilities_with_ratings[facilities_with_ratings['open_now'] == True]
+
         st.session_state["facilities"] = facilities_with_ratings
 
         # Only regenerate the map when new data is fetched
@@ -193,6 +201,7 @@ if st.button("Search", key="search_button"):
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
                 f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
+                f"Open Now: {'Yes' if row['open_now'] else 'No'}<br>"
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
 
