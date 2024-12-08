@@ -41,8 +41,22 @@ def classify_issue(issue_description):
     import openai
 
     # Add your OpenAI API Key
-    OPENAI_API_KEY = st.secrets["api_keys"]["openai"]
+    OPENAI_API_KEY = "your-openai-api-key"
     openai.api_key = OPENAI_API_KEY
+
+    try:
+        response = openai.Chat.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "Classify problems into healthcare categories: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
+                {"role": "user", "content": issue_description}
+            ]
+        )
+        return response.choices[0].message["content"]
+    except Exception as e:
+        st.error(f"Error with GPT classification: {e}")
+        return "All Healthcare"
+
 
     try:
         response = openai.ChatCompletion.create(
