@@ -47,7 +47,7 @@ def classify_issue(issue_description):
     try:
         # Legacy usage for openai<1.0.0
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a classifier for healthcare problems. Respond with one of the following categories: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
                 {"role": "user", "content": issue_description}
