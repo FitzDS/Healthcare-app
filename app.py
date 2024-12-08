@@ -165,15 +165,15 @@ if st.button("Search", key="search_button"):
         for _, row in facilities_with_ratings.iterrows():
             rating = row['rating']
             category = row['category']
-            icon = CATEGORY_ICONS.get(category, 'info-sign')
-
+            icon = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
+        
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
                 f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
-
+        
             if rating == 'N/A' or float(rating) <= 1:
                 marker_color = 'gray'
             elif 1 < float(rating) <= 2:
@@ -184,12 +184,13 @@ if st.button("Search", key="search_button"):
                 marker_color = 'blue'
             else:
                 marker_color = 'green'
-
+        
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
                 icon=folium.Icon(icon=icon, color=marker_color)
             ).add_to(m)
+
 
         st.session_state["map"] = m
 
