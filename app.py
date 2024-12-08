@@ -173,10 +173,21 @@ if st.button("Search", key="search_button"):
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
 
+            if rating == 'N/A' or float(rating) <= 1:
+                marker_color = 'gray'
+            elif 1 < float(rating) <= 2:
+                marker_color = 'yellow'
+            elif 2 < float(rating) <= 3:
+                marker_color = 'orange'
+            elif 3 < float(rating) <= 4:
+                marker_color = 'blue'
+            else:
+                marker_color = 'green'
+
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.Icon(icon=icon, color='blue')
+                icon=folium.Icon(icon=icon, color=marker_color)
             ).add_to(m)
 
         st.session_state["map"] = m
@@ -198,7 +209,8 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-# Add a legend to explain marker colors and icons
+
+# Add legend for marker colors and icons
 st.markdown("""### Legend
 - **Red Marker**: Current Location
 - **Icons**:
@@ -216,3 +228,7 @@ st.markdown("""### Legend
   - **Yellow**: 1-2 Stars
   - **Gray**: Unrated or 0-1 Stars
 """)
+
+# Show data in a table if facilities exist
+if "facilities" in st.session_state and not st.session_state["facilities"].empty:
+    st.dataframe(st.session_state["facilities"])
