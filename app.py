@@ -170,6 +170,22 @@ if st.button("Search", key="search_button"):
             category = row.get('category', 'healthcare')
             icon_class = CATEGORY_ICONS.get(category, "fa-info-circle")  # Default to 'info-circle'
         
+            # Determine marker color based on rating
+            rating = row['rating']
+            if rating == 'N/A' or float(rating) <= 1:
+                marker_color = 'gray'
+            elif 1 < float(rating) <= 2:
+                marker_color = 'yellow'
+            elif 2 < float(rating) <= 3:
+                marker_color = 'orange'
+            elif 3 < float(rating) <= 4:
+                marker_color = 'blue'
+            else:
+                marker_color = 'green'
+        
+            # Debugging: print marker color and icon class
+            print(f"Category: {category}, Icon: {icon_class}, Marker Color: {marker_color}")
+        
             # Prepare HTML content for the marker
             html_icon = f"""
             <div style="color: {marker_color}; text-align: center;">
@@ -189,7 +205,6 @@ if st.button("Search", key="search_button"):
                 popup=popup_content,
                 icon=folium.DivIcon(html=html_icon)
             ).add_to(m)
-
 
 
 
