@@ -198,3 +198,21 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+# Add a legend to explain marker colors and icons
+st.markdown("""### Legend
+- **Red Marker**: Current Location
+- **Icons**:
+  - 🏥 Hospital
+  - 💊 Pharmacy
+  - 🦷 Dentist
+  - 🐾 Veterinary
+  - 🩺 Clinic
+  - 🚑 Emergency
+  - 🚶 Rehabilitation
+- **Rating Colors**:
+  - **Green**: 4-5 Stars
+  - **Blue**: 3-4 Stars
+  - **Orange**: 2-3 Stars
+  - **Yellow**: 1-2 Stars
+  - **Gray**: Unrated or 0-1 Stars
+""")
