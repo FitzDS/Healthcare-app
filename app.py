@@ -202,7 +202,7 @@ if st.button("Search", key="search_button"):
 
 
 
-st.session_state["map"] = m
+    st.session_state["map"] = m
 
 if "map" in st.session_state and st.session_state["map"] is not None:
     st_folium(st.session_state["map"], width=700, height=500)
