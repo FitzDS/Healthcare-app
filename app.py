@@ -158,6 +158,11 @@ if st.button("Search", key="search_button"):
         st.session_state["facilities"] = facilities_with_ratings
 
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+        m.get_root().html.add_child(folium.Element(
+            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
+        ))
+        
         folium.Circle(
             location=[latitude, longitude],
             radius=radius,
@@ -183,10 +188,10 @@ if st.button("Search", key="search_button"):
             else:
                 marker_color = 'green'
         
-            # Debugging: print marker color and icon class
-            print(f"Category: {category}, Icon: {icon_class}, Marker Color: {marker_color}")
+            # Debugging (optional)
+            print(f"Category: {category}, Icon: {icon_class}, Color: {marker_color}")
         
-            # Prepare HTML content for the marker
+            # Construct HTML for the icon
             html_icon = f"""
             <div style="color: {marker_color}; text-align: center;">
                 <i class="fa {icon_class}" style="font-size: 24px;"></i>
@@ -203,7 +208,7 @@ if st.button("Search", key="search_button"):
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.DivIcon(html=html_icon)
+                icon=DivIcon(html=html_icon)
             ).add_to(m)
 
 
