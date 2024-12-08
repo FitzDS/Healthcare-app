@@ -4,7 +4,7 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
-from folium.features import CustomIcon
+from folium.features import DivIcon
 
 # Load API keys (replace with secure secrets management later)
 GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
