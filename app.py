@@ -200,12 +200,7 @@ folium.Marker(
         popup="Current Location",
         icon=folium.Icon(color="red")
     ).add_to(default_map)
-folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(color="red")
-    ).add_to(default_map)
-    folium.Circle(
+folium.Circle(
         location=[latitude, longitude],
         radius=radius,
         color="blue",
