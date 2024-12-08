@@ -38,19 +38,20 @@ def classify_issue(issue_description):
     """
     Classify an issue description into one of the CARE_TYPES categories.
     """
-    if "medicine" in issue_description.lower() or "pharmacy" in issue_description.lower():
+    issue_description = issue_description.lower()
+    if "medicine" in issue_description or "pharmacy" in issue_description:
         return "Pharmacy"
-    elif "emergency" in issue_description.lower() or "urgent" in issue_description.lower():
+    elif "emergency" in issue_description or "urgent" in issue_description:
         return "Emergency"
-    elif "teeth" in issue_description.lower() or "dentist" in issue_description.lower():
+    elif "teeth" in issue_description or "dentist" in issue_description:
         return "Dentist"
-    elif "rehabilitation" in issue_description.lower() or "therapy" in issue_description.lower():
+    elif "rehabilitation" in issue_description or "therapy" in issue_description:
         return "Rehabilitation"
-    elif "vet" in issue_description.lower() or "animal" in issue_description.lower():
+    elif "vet" in issue_description or "animal" in issue_description:
         return "Veterinary"
-    elif "clinic" in issue_description.lower():
+    elif "clinic" in issue_description:
         return "Clinic"
-    elif "hospital" in issue_description.lower():
+    elif "hospital" in issue_description:
         return "Hospital"
     else:
         return "All Healthcare"
@@ -234,8 +235,7 @@ if st.button("Search", key="search_button"):
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.Icon(color=marker_color)
-            ).add_to(m)
+                icon=folium.Icon(color=marker_color)).add_to(m)
 
         # Add or update the marker for the user's current location with the "info-sign" icon
         st.session_state["current_location_marker"] = folium.Marker(
@@ -249,7 +249,6 @@ if st.button("Search", key="search_button"):
 
 # Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
-    # Ensure the current location marker persists
     st_folium(st.session_state["map"], width=700, height=500)
 else:
     default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
@@ -266,3 +265,5 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+           
