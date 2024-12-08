@@ -7,7 +7,7 @@ from streamlit_folium import st_folium
 import folium
 
 # Load API keys directly from the code for now (replace with secrets later)
-GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
+GEOAPIFY_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 
 CARE_TYPES = {
@@ -20,6 +20,12 @@ CARE_TYPES = {
     "Emergency": "healthcare.emergency",
     "Veterinary": "healthcare.veterinary",
 }
+
+# Initialize session state for map and facilities
+if "map" not in st.session_state:
+    st.session_state["map"] = None
+if "facilities" not in st.session_state:
+    st.session_state["facilities"] = pd.DataFrame()
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -50,23 +56,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
 
-def get_travel_time_distance(origin, destination):
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-    params = {
-        "origins": f"{origin[0]},{origin[1]}",
-        "destinations": f"{destination[0]},{destination[1]}",
-        "key": GOOGLE_API_KEY,
-        "mode": "driving",
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        if "rows" in data and len(data["rows"]) > 0:
-            elements = data["rows"][0].get("elements", [])
-            if elements and elements[0].get("status") == "OK":
-                return elements[0]["distance"]["text"], elements[0]["duration"]["text"]
-    return "N/A", "N/A"
-
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
     params = {"address": query, "key": GOOGLE_API_KEY}
@@ -96,10 +85,6 @@ longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
 
-# Debugging outputs
-st.write("Debug Info:")
-st.write(f"Latitude: {latitude}, Longitude: {longitude}, Radius: {radius}")
-
 # Handle location query
 if location_query:
     lat, lon = get_lat_lon_from_query(location_query)
@@ -115,44 +100,17 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
-# Default map preview
-st.markdown("""### Legend
-- **Red**: Current Location
-- **Green**: 4-5 Stars
-- **Orange**: 3-4 Stars
-- **Yellow**: 1-2 Stars
-- **Gray**: Unrated""")
-st.write("Default Map Preview:")
-default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-folium.Marker(
-    location=[latitude, longitude],
-    popup="Current Location",
-    icon=folium.Icon(color="darkred")
-).add_to(default_map)
-folium.Marker(
-    location=[latitude, longitude],
-    popup="Current Location",
-    icon=folium.Icon(color="red")
-).add_to(default_map)
-folium.Circle(
-    location=[latitude, longitude],
-    radius=radius,
-    color="blue",
-    fill=True,
-    fill_opacity=0.4
-).add_to(default_map)
-st_folium(default_map, width=700, height=500)
-
+# Search button logic
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
+    st.session_state["facilities"] = facilities
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
+        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(f"Found {len(facilities)} facilities.")
-
-        # Create map with results
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
 
         folium.Circle(
@@ -177,26 +135,33 @@ if st.button("Search", key="search_button"):
             else:
                 marker_color = 'green'
 
-            # Add marker with the determined color
-            destination = (row["latitude"], row["longitude"])
-            distance, duration = get_travel_time_distance((latitude, longitude), destination)
-
-            popup_content = (
-                f"<b>{row['name']}</b><br>"
-                f"Address: {row['address']}<br>"
-                f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
-                f"Distance: {distance}<br>"
-                f"Travel Time: {duration}<br>"
-                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
-            )
-
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=popup_content,
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                icon=folium.Icon(color=marker_color)
             ).add_to(m)
 
-        # Render map with results
-        st_folium(m, width=700, height=500)
+        st.session_state["map"] = m
 
-        # Show data in a table
-        st.dataframe(facilities)
+# Display the map
+if st.session_state["map"] is not None:
+    st_folium(st.session_state["map"], width=700, height=500)
+else:
+    default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+    folium.Marker(
+        location=[latitude, longitude],
+        popup="Current Location",
+        icon=folium.Icon(color="red")
+    ).add_to(default_map)
+    folium.Circle(
+        location=[latitude, longitude],
+        radius=radius,
+        color="blue",
+        fill=True,
+        fill_opacity=0.4
+    ).add_to(default_map)
+    st_folium(default_map, width=700, height=500)
+
+# Show data in a table if facilities exist
+if not st.session_state["facilities"].empty:
+    st.dataframe(st.session_state["facilities"])
