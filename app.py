@@ -93,7 +93,7 @@ location_query = st.text_input("Search by Location:")
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
-radius = st.slider("Search Radius (meters):", min_value=1000, max_value=200000, step=1000, value=50000)
+radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
 
 # Debugging outputs
@@ -118,6 +118,16 @@ if use_current_location:
 # Default map preview
 st.write("Default Map Preview:")
 default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+folium.Marker(
+    location=[latitude, longitude],
+    popup="Selected Location",
+    icon=folium.Icon(color="green")
+).add_to(m)
+folium.Marker(
+    location=[latitude, longitude],
+    popup="Current Location",
+    icon=folium.Icon(color="red")
+).add_to(default_map)
 folium.Circle(
     location=[latitude, longitude],
     radius=radius,
