@@ -120,9 +120,9 @@ st.write("Default Map Preview:")
 default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
 folium.Marker(
     location=[latitude, longitude],
-    popup="Selected Location",
-    icon=folium.Icon(color="green")
-).add_to(m)
+    popup="Current Location",
+    icon=folium.Icon(color="red")
+).add_to(default_map)
 folium.Marker(
     location=[latitude, longitude],
     popup="Current Location",
