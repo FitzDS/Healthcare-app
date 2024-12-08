@@ -5,7 +5,7 @@ import geocoder
 from streamlit_folium import st_folium
 import folium
 
-# Load API keys (replace with secure secrets management later)
+# Load API keys
 GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
 GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 
@@ -25,10 +25,6 @@ if "map" not in st.session_state:
     st.session_state["map"] = None
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
-
-# Ensure the current location marker is persistent
-if "current_location_marker" not in st.session_state:
-    st.session_state["current_location_marker"] = None
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -50,7 +46,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "address": properties.get("formatted", "N/A"),
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
-                "category": properties.get("categories", ["healthcare"])[0]
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
@@ -60,7 +55,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
 
 def fetch_ratings_for_existing_places(facilities_df):
     updated_facilities = []
-
     for _, facility in facilities_df.iterrows():
         url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
         params = {
@@ -70,9 +64,7 @@ def fetch_ratings_for_existing_places(facilities_df):
             'locationbias': f"point:{facility['latitude']},{facility['longitude']}",
             'key': GOOGLE_API_KEY
         }
-
         response = requests.get(url, params=params)
-
         if response.status_code == 200:
             data = response.json()
             if data.get('candidates'):
@@ -86,9 +78,7 @@ def fetch_ratings_for_existing_places(facilities_df):
             st.error(f"Error fetching ratings for {facility['name']}: {response.status_code}")
             facility['rating'] = 'N/A'
             facility['user_ratings_total'] = 0
-
         updated_facilities.append(facility)
-
     return pd.DataFrame(updated_facilities)
 
 def get_lat_lon_from_query(query):
@@ -156,7 +146,6 @@ if st.button("Search", key="search_button"):
         facilities_with_ratings = fetch_ratings_for_existing_places(facilities)
         st.session_state["facilities"] = facilities_with_ratings
 
-        # Only regenerate the map when new data is fetched
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
@@ -167,7 +156,6 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
-            # Determine marker color based on rating
             rating = row['rating']
             if rating == 'N/A' or float(rating) <= 1:
                 marker_color = 'gray'
@@ -193,34 +181,13 @@ if st.button("Search", key="search_button"):
                 icon=folium.Icon(color=marker_color)
             ).add_to(m)
 
-        # Add or update the marker for the user's current location with the "info-sign" icon
-        st.session_state["current_location_marker"] = folium.Marker(
+        folium.Marker(
             location=[latitude, longitude],
             popup="Current Location",
             icon=folium.Icon(icon="info-sign", color="red")
-        )
-        st.session_state["current_location_marker"].add_to(m)
+        ).add_to(m)
 
         st.session_state["map"] = m
 
-# Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
-    # Ensure the current location marker persists
-    if st.session_state["current_location_marker"] is not None:
-        st.session_state["current_location_marker"].add_to(st.session_state["map"])
     st_folium(st.session_state["map"], width=700, height=500)
-else:
-    default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(icon="info-sign", color="red")
-    ).add_to(default_map)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(default_map)
-    st_folium(default_map, width=700, height=500)
