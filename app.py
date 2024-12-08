@@ -112,6 +112,17 @@ def get_current_location():
 
 st.title("Healthcare Facility Locator")
 
+# Add legend above the map
+st.markdown("""### Legend
+- **Red Marker**: Current Location
+- **Rating Colors**:
+  - **Green**: 4-5 Stars
+  - **Blue**: 3-4 Stars
+  - **Orange**: 2-3 Stars
+  - **Yellow**: 1-2 Stars
+  - **Gray**: Unrated or 0-1 Stars
+""")
+
 location_query = st.text_input("Search by Location:")
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
@@ -155,6 +166,19 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
+            # Determine marker color based on rating
+            rating = row['rating']
+            if rating == 'N/A' or float(rating) <= 1:
+                marker_color = 'gray'
+            elif 1 < float(rating) <= 2:
+                marker_color = 'yellow'
+            elif 2 < float(rating) <= 3:
+                marker_color = 'orange'
+            elif 3 < float(rating) <= 4:
+                marker_color = 'blue'
+            else:
+                marker_color = 'green'
+
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
@@ -164,7 +188,8 @@ if st.button("Search", key="search_button"):
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=popup_content
+                popup=popup_content,
+                icon=folium.Icon(color=marker_color)
             ).add_to(m)
 
         # Add or update the marker for the user's current location with the "info-sign" icon
@@ -197,14 +222,3 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
-# Add legend for marker colors and icons
-st.markdown("""### Legend
-- **Red Marker**: Current Location
-- **Rating Colors**:
-  - **Green**: 4-5 Stars
-  - **Blue**: 3-4 Stars
-  - **Orange**: 2-3 Stars
-  - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
-""")
