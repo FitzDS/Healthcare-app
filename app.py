@@ -7,8 +7,8 @@ from streamlit_folium import st_folium
 import folium
 
 # Load API keys directly from the code for now (replace with secrets later)
-GEOAPIFY_API_KEY = "your_geoapify_api_key"
-GOOGLE_API_KEY = "your_google_api_key"
+GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
+GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
