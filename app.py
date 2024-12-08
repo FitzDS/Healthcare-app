@@ -206,5 +206,5 @@ st.markdown("""### Legend
   - **Blue**: 3-4 Stars
   - **Orange**: 2-3 Stars
   - **Yellow**: 1-2 Stars
-
-
+  - **Gray**: Unrated or 0-1 Stars
+""")
