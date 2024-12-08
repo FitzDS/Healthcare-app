@@ -20,6 +20,44 @@ CARE_TYPES = {
     "Veterinary": "healthcare.veterinary",
 }
 
+# Translations for different languages
+translations = {
+    "en": {
+        "title": "Healthcare Facility Locator",
+        "search_location": "Search by Location:",
+        "use_current_location": "Use Current Location",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "radius": "Search Radius (meters):",
+        "care_type": "Type of Care:",
+        "show_open_only": "Show Open Facilities Only",
+        "legend": "Legend",
+        "found_facilities": "Found {} facilities.",
+        "no_facilities": "No facilities found. Check your API key, location, or radius.",
+        "open_now": "Open Now",
+        "directions": "Get Directions",
+    },
+    "es": {
+        "title": "Localizador de Centros de Salud",
+        "search_location": "Buscar por Ubicación:",
+        "use_current_location": "Usar Ubicación Actual",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "radius": "Radio de Búsqueda (metros):",
+        "care_type": "Tipo de Atención:",
+        "show_open_only": "Mostrar solo Centros Abiertos",
+        "legend": "Leyenda",
+        "found_facilities": "Se encontraron {} centros.",
+        "no_facilities": "No se encontraron centros. Verifique su clave API, ubicación o radio.",
+        "open_now": "Abierto Ahora",
+        "directions": "Obtener Indicaciones",
+    },
+}
+
+# Select language
+selected_language = st.selectbox("Choose Language / Seleccione el idioma:", options=["en", "es"])
+lang = translations[selected_language]
+
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
@@ -84,29 +122,10 @@ def fetch_ratings_and_open_status(facilities_df):
         updated_facilities.append(facility)
     return pd.DataFrame(updated_facilities)
 
-def get_lat_lon_from_query(query):
-    url = f"https://maps.googleapis.com/maps/api/geocode/json"
-    params = {"address": query, "key": GOOGLE_API_KEY}
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        if data["results"]:
-            location = data["results"][0]["geometry"]["location"]
-            return location["lat"], location["lng"]
-    st.error("Location not found. Please try again.")
-    return None, None
-
-def get_current_location():
-    g = geocoder.ip('me')
-    if g.ok:
-        return g.latlng
-    st.error("Unable to detect current location.")
-    return [38.5449, -121.7405]
-
-st.title("Healthcare Facility Locator")
+st.title(lang["title"])
 
 # Add legend above the map
-st.markdown("""### Legend
+st.markdown(f"""### {lang['legend']}
 - **Red Marker**: Current Location
 - **Rating Colors**:
   - **Green**: 4-5 Stars
@@ -116,37 +135,37 @@ st.markdown("""### Legend
   - **Gray**: Unrated or 0-1 Stars
 """)
 
-location_query = st.text_input("Search by Location:")
-use_current_location = st.button("Use Current Location", key="current_location_button")
-latitude = st.number_input("Latitude", value=38.5449)
-longitude = st.number_input("Longitude", value=-121.7405)
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
-care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
-show_open_only = st.checkbox("Show Open Facilities Only", value=False)
+location_query = st.text_input(lang["search_location"])
+use_current_location = st.button(lang["use_current_location"], key="current_location_button")
+latitude = st.number_input(lang["latitude"], value=38.5449)
+longitude = st.number_input(lang["longitude"], value=-121.7405)
+radius = st.slider(lang["radius"], min_value=500, max_value=200000, step=1000, value=20000)
+care_type = st.selectbox(lang["care_type"], options=list(CARE_TYPES.keys()))
+show_open_only = st.checkbox(lang["show_open_only"], value=False)
 
 if location_query:
     lat, lon = get_lat_lon_from_query(location_query)
     if lat and lon:
         latitude = lat
         longitude = lon
-        st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
+        st.write(f"{lang['search_location']} {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
 if use_current_location:
     current_location = get_current_location()
     latitude = current_location[0]
     longitude = current_location[1]
-    st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
+    st.write(f"{lang['use_current_location']} (Latitude: {latitude}, Longitude: {longitude})")
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
 
     if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
+        st.error(lang["no_facilities"])
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
         st.session_state["facilities"] = pd.DataFrame()
     else:
-        st.write(f"Found {len(facilities)} facilities.")
+        st.write(lang["found_facilities"].format(len(facilities)))
         facilities_with_ratings = fetch_ratings_and_open_status(facilities)
         if show_open_only:
             facilities_with_ratings = facilities_with_ratings[
@@ -180,8 +199,8 @@ if st.button("Search", key="search_button"):
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
                 f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
-                f"Open Now: {'Yes' if row['open_now'] else 'No'}<br>"
-                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
+                f"{lang['open_now']}: {'Yes' if row['open_now'] else 'No'}<br>"
+                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}&hl={selected_language}' target='_blank'>{lang['directions']}</a>"
             )
 
             folium.Marker(
