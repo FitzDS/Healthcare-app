@@ -124,26 +124,32 @@ st.markdown("""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
+if selected_language == "es":
+    st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
+else:
+    st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
 
-if use_current_location:
-    current_location = get_current_location()
-    latitude = current_location[0]
-    longitude = current_location[1]
-    st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
-    location_query = ""  # Clear the location query to avoid conflicts
-
-elif location_query:
+if location_query:
     lat, lon = get_lat_lon_from_query(location_query)
     if lat and lon:
         latitude = lat
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
+if use_current_location:
+    if selected_language == "es":
+        st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
+    else:
+        st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
+    current_location = get_current_location()
+    latitude = current_location[0]
+    longitude = current_location[1]
+    st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
