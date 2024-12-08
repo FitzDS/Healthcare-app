@@ -20,6 +20,17 @@ CARE_TYPES = {
     "Veterinary": "healthcare.veterinary",
 }
 
+CATEGORY_ICONS = {
+    "healthcare": "hospital-symbol",
+    "healthcare.pharmacy": "capsules",
+    "healthcare.hospital": "clinic-medical",
+    "healthcare.clinic": "stethoscope",
+    "healthcare.dentist": "tooth",
+    "healthcare.rehabilitation": "walking",
+    "healthcare.emergency": "ambulance",
+    "healthcare.veterinary": "paw",
+}
+
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
@@ -46,6 +57,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "address": properties.get("formatted", "N/A"),
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
+                "category": properties.get("categories", ["healthcare"])[0]
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
@@ -151,16 +163,8 @@ if st.button("Search", key="search_button"):
 
         for _, row in facilities_with_ratings.iterrows():
             rating = row['rating']
-            if rating == 'N/A' or float(rating) <= 1:
-                marker_color = 'gray'
-            elif 1 < float(rating) <= 2:
-                marker_color = 'yellow'
-            elif 2 < float(rating) <= 3:
-                marker_color = 'orange'
-            elif 3 < float(rating) <= 4:
-                marker_color = 'blue'
-            else:
-                marker_color = 'green'
+            category = row['category']
+            icon = CATEGORY_ICONS.get(category, 'info-sign')
 
             popup_content = (
                 f"<b>{row['name']}</b><br>"
@@ -172,7 +176,7 @@ if st.button("Search", key="search_button"):
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.Icon(color=marker_color)
+                icon=folium.Icon(icon=icon, color='blue')
             ).add_to(m)
 
         st.session_state["map"] = m
@@ -194,11 +198,3 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
-st.markdown("""### Legend
-- **Red**: Current Location
-- **Green**: 4-5 Stars
-- **Orange**: 3-4 Stars
-- **Yellow**: 1-2 Stars
-- **Gray**: Unrated or 0-1 Stars
-""")
