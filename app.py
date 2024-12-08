@@ -6,8 +6,8 @@ from streamlit_folium import st_folium
 import folium
 
 # Load API keys (replace with secure secrets management later)
-GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
-GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
+GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
+GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
@@ -36,33 +36,25 @@ if "current_location_marker" not in st.session_state:
 
 def classify_issue(issue_description):
     """
-    Classify an issue description using the legacy OpenAI API.
+    Classify an issue description into one of the CARE_TYPES categories.
     """
-    import openai
-
-    # Your OpenAI API key
-    
-    openai.api_key = st.secrets["api_keys"]["openai"]
-
-    try:
-        # Legacy usage for openai<1.0.0
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a classifier for healthcare problems. Respond with one of the following categories: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
-                {"role": "user", "content": issue_description}
-            ]
-        )
-        return response['choices'][0]['message']['content'].strip()
-    except Exception as e:
-        st.error(f"Error with GPT classification: {e}")
+    issue_description = issue_description.lower()
+    if "medicine" in issue_description or "pharmacy" in issue_description:
+        return "Pharmacy"
+    elif "emergency" in issue_description or "urgent" in issue_description:
+        return "Emergency"
+    elif "teeth" in issue_description or "dentist" in issue_description:
+        return "Dentist"
+    elif "rehabilitation" in issue_description or "therapy" in issue_description:
+        return "Rehabilitation"
+    elif "vet" in issue_description or "animal" in issue_description:
+        return "Veterinary"
+    elif "clinic" in issue_description:
+        return "Clinic"
+    elif "hospital" in issue_description:
+        return "Hospital"
+    else:
         return "All Healthcare"
-
-
-
-
-
-
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -139,6 +131,7 @@ def get_lat_lon_from_query(query):
             return location["lat"], location["lng"]
     st.error("Location not found. Please try again.")
     return None, None
+
 def get_current_location():
     g = geocoder.ip('me')
     if g.ok:
@@ -178,7 +171,8 @@ if issue_description:
 
 if use_current_location:
     current_location = get_current_location()
-    latitude, longitude = current_location
+    latitude = current_location[0]
+    longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
     location_query = ""  # Clear the location query to avoid conflicts
 
@@ -271,3 +265,5 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+           
