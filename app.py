@@ -206,8 +206,6 @@ if st.button("Search", key="search_button"):
 # Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
     # Ensure the current location marker persists
-    if st.session_state["current_location_marker"] is not None:
-        st.session_state["current_location_marker"].add_to(st.session_state["map"])
     st_folium(st.session_state["map"], width=700, height=500)
 else:
     default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
