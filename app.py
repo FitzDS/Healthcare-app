@@ -86,12 +86,6 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]  # Default to Davis, CA
 
-# Initialize session state for map and facilities
-if "map" not in st.session_state:
-    st.session_state["map"] = None
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
-
 st.title("Healthcare Facility Locator")
 
 # Input options
@@ -101,6 +95,10 @@ latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=1000, max_value=200000, step=1000, value=50000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
+
+# Debugging outputs
+st.write("Debug Info:")
+st.write(f"Latitude: {latitude}, Longitude: {longitude}, Radius: {radius}")
 
 # Handle location query
 if location_query:
@@ -117,18 +115,37 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
-# Search button logic
+# Default map preview
+st.write("Default Map Preview:")
+default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+folium.Circle(
+    location=[latitude, longitude],
+    radius=radius,
+    color="blue",
+    fill=True,
+    fill_opacity=0.4
+).add_to(default_map)
+st_folium(default_map, width=700, height=500)
+
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
-    st.session_state["facilities"] = facilities
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
-        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(f"Found {len(facilities)} facilities.")
+
+        # Create map with results
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+        folium.Circle(
+            location=[latitude, longitude],
+            radius=radius,
+            color="blue",
+            fill=True,
+            fill_opacity=0.4
+        ).add_to(m)
 
         for _, row in facilities.iterrows():
             destination = (row["latitude"], row["longitude"])
@@ -147,12 +164,9 @@ if st.button("Search", key="search_button"):
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
             ).add_to(m)
-        st.session_state["map"] = m
 
-# Render the appropriate map
-if st.session_state["map"] is not None:
-    st_folium(st.session_state["map"], width=700, height=500)
+        # Render map with results
+        st_folium(m, width=700, height=500)
 
-# Show data in a table if facilities exist
-if not st.session_state["facilities"].empty:
-    st.dataframe(st.session_state["facilities"])
+        # Show data in a table
+        st.dataframe(facilities)
