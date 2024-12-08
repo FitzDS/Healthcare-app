@@ -6,9 +6,9 @@ import geocoder
 from streamlit_folium import st_folium
 import folium
 
-# Load API keys from environment variables
-GEOAPIFY_API_KEY = os.getenv("GEOAPIFY_API_KEY")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# Load API keys directly from the code for now (replace with secrets later)
+GEOAPIFY_API_KEY = "your_geoapify_api_key"
+GOOGLE_API_KEY = "your_google_api_key"
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
@@ -47,7 +47,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
-        st.error(f"Error fetching data: {response.status_code}")
+        st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
 
 def get_travel_time_distance(origin, destination):
@@ -96,6 +96,10 @@ longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=1000, max_value=200000, step=1000, value=50000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
 
+# Debugging outputs
+st.write("Debug Info:")
+st.write(f"Latitude: {latitude}, Longitude: {longitude}, Radius: {radius}")
+
 # Handle location query
 if location_query:
     lat, lon = get_lat_lon_from_query(location_query)
@@ -111,21 +115,21 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
-# Initialize a default map preview
+# Default map preview
+st.write("Default Map Preview:")
 default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
 st_folium(default_map, width=700, height=500)
 
-# Handle the search functionality
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
 
     if facilities.empty:
-        st.write("No facilities found. Try adjusting your search parameters.")
+        st.error("No facilities found. Check your API key, location, or radius.")
     else:
         st.write(f"Found {len(facilities)} facilities.")
 
-        # Create a map with search results
+        # Create map with results
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
 
         for _, row in facilities.iterrows():
@@ -146,9 +150,8 @@ if st.button("Search", key="search_button"):
                 popup=popup_content,
             ).add_to(m)
 
-        # Render the map in Streamlit
+        # Render map with results
         st_folium(m, width=700, height=500)
 
-        # Display the search results in a table
+        # Show data in a table
         st.dataframe(facilities)
-
