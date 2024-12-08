@@ -164,13 +164,15 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
+            # Fetch facility information
             rating = row['rating']
             category = row.get('category', 'healthcare')
             icon = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
         
-            # Debugging
-            print(f"Category: {category}, Icon: {icon}")
+            # Debugging (to verify which icons are being assigned)
+            print(f"Category: {category}, Assigned Icon: {icon}")
         
+            # Prepare popup content
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
@@ -178,6 +180,7 @@ if st.button("Search", key="search_button"):
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
         
+            # Determine marker color based on rating
             if rating == 'N/A' or float(rating) <= 1:
                 marker_color = 'gray'
             elif 1 < float(rating) <= 2:
@@ -188,12 +191,14 @@ if st.button("Search", key="search_button"):
                 marker_color = 'blue'
             else:
                 marker_color = 'green'
-        
-            folium.Marker(
-                location=[row["latitude"], row["longitude"]],
-                popup=popup_content,
-                icon=folium.Icon(icon=icon, color=marker_color)
-            ).add_to(m)
+
+    # Add marker to map
+    folium.Marker(
+        location=[row["latitude"], row["longitude"]],
+        popup=popup_content,
+        icon=folium.Icon(icon=icon, color=marker_color)  # Set category-specific icon and color
+    ).add_to(m)
+
 
 
 
