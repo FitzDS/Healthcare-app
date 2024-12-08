@@ -45,20 +45,6 @@ def classify_issue(issue_description):
     openai.api_key = OPENAI_API_KEY
 
     try:
-        response = openai.Chat.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Classify problems into healthcare categories: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
-                {"role": "user", "content": issue_description}
-            ]
-        )
-        return response.choices[0].message["content"]
-    except Exception as e:
-        st.error(f"Error with GPT classification: {e}")
-        return "All Healthcare"
-
-
-    try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -66,10 +52,11 @@ def classify_issue(issue_description):
                 {"role": "user", "content": issue_description}
             ]
         )
-        return response["choices"][0]["message"]["content"]
+        return response['choices'][0]['message']['content']
     except Exception as e:
         st.error(f"Error with GPT classification: {e}")
         return "All Healthcare"
+
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
