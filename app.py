@@ -7,7 +7,7 @@ from streamlit_folium import st_folium
 import folium
 
 # Load API keys directly from the code for now (replace with secrets later)
-GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
+GEOAPIFY_API_KEY =  "f01884465c8743a9a1d805d1c778e7af"
 GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
 
 CARE_TYPES = {
@@ -20,12 +20,6 @@ CARE_TYPES = {
     "Emergency": "healthcare.emergency",
     "Veterinary": "healthcare.veterinary",
 }
-
-# Initialize session state for map and facilities
-if "map" not in st.session_state:
-    st.session_state["map"] = None
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -47,14 +41,52 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "address": properties.get("formatted", "N/A"),
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
-                "rating": properties.get("rating", "N/A"),
-                "user_ratings_total": properties.get("user_ratings_total", 0),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
+
+def fetch_ratings_for_existing_places(facilities_df):
+    """
+    Fetch ratings from Google Places API for facilities fetched using Geoapify.
+    :param facilities_df: DataFrame containing facilities from Geoapify.
+    :return: DataFrame with ratings added (if available).
+    """
+    updated_facilities = []
+
+    for _, facility in facilities_df.iterrows():
+        url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+        params = {
+            'input': facility['name'],  # Search by facility name
+            'inputtype': 'textquery',
+            'fields': 'rating,user_ratings_total',  # Fetch rating and review count
+            'locationbias': f"point:{facility['latitude']},{facility['longitude']}",
+            'key': GOOGLE_API_KEY
+        }
+
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('candidates'):
+                # If ratings are found, update the facility's information
+                candidate = data['candidates'][0]
+                facility['rating'] = candidate.get('rating', 'N/A')
+                facility['user_ratings_total'] = candidate.get('user_ratings_total', 0)
+            else:
+                # If no ratings found, set to 'N/A'
+                facility['rating'] = 'N/A'
+                facility['user_ratings_total'] = 0
+        else:
+            st.error(f"Error fetching ratings for {facility['name']}: {response.status_code}")
+            facility['rating'] = 'N/A'
+            facility['user_ratings_total'] = 0
+
+        updated_facilities.append(facility)
+
+    return pd.DataFrame(updated_facilities)
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -100,17 +132,42 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
-# Search button logic
+# Default map preview
+st.markdown("""### Legend
+- **Red**: Current Location
+- **Green**: 4-5 Stars
+- **Orange**: 3-4 Stars
+- **Yellow**: 1-2 Stars
+- **Gray**: Unrated""")
+st.write("Default Map Preview:")
+default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+folium.Marker(
+    location=[latitude, longitude],
+    popup="Current Location",
+    icon=folium.Icon(color="red")
+).add_to(default_map)
+folium.Circle(
+    location=[latitude, longitude],
+    radius=radius,
+    color="blue",
+    fill=True,
+    fill_opacity=0.4
+).add_to(default_map)
+st_folium(default_map, width=700, height=500)
+
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
-    st.session_state["facilities"] = facilities
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
-        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(f"Found {len(facilities)} facilities.")
+
+        # Add ratings from Google Places API
+        facilities_with_ratings = fetch_ratings_for_existing_places(facilities)
+
+        # Create map with results
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
 
         folium.Circle(
@@ -121,7 +178,7 @@ if st.button("Search", key="search_button"):
             fill_opacity=0.4
         ).add_to(m)
 
-        for _, row in facilities.iterrows():
+        for _, row in facilities_with_ratings.iterrows():
             # Determine marker color based on rating
             rating = row['rating']
             if rating == 'N/A' or float(rating) <= 1:
@@ -135,33 +192,21 @@ if st.button("Search", key="search_button"):
             else:
                 marker_color = 'green'
 
+            popup_content = (
+                f"<b>{row['name']}</b><br>"
+                f"Address: {row['address']}<br>"
+                f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
+                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
+            )
+
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
-                icon=folium.Icon(color=marker_color)
-            ).add_to(m)
+                popup=popup_content,
+                icon=folium.Icon(color=marker_color)).add_to(m)
 
-        st.session_state["map"] = m
+        # Render map with results
+        st_folium(m, width=700, height=500)
 
-# Display the map
-if st.session_state["map"] is not None:
-    st_folium(st.session_state["map"], width=700, height=500)
-else:
-    default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(color="red")
-    ).add_to(default_map)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(default_map)
-    st_folium(default_map, width=700, height=500)
+        # Show data in a table
+        st.dataframe(facilities_with_ratings)
 
-# Show data in a table if facilities exist
-if not st.session_state["facilities"].empty:
-    st.dataframe(st.session_state["facilities"])
