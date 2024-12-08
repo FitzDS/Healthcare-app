@@ -167,7 +167,7 @@ if st.button("Search", key="search_button"):
 
         for _, row in facilities_with_ratings.iterrows():
             category = row.get('category', 'healthcare')  # Default to 'healthcare'
-            icon_name = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
+            icon_name = CATEGORY_ICONS.get(category, 'medkit')  # Default to 'info-sign'
         
             # Determine marker color based on rating
             rating = row['rating']
