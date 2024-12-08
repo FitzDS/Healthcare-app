@@ -34,6 +34,27 @@ if "facilities" not in st.session_state:
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
 
+def classify_issue(issue_description):
+    """
+    Classify an issue description into one of the CARE_TYPES categories.
+    """
+    if "medicine" in issue_description.lower() or "pharmacy" in issue_description.lower():
+        return "Pharmacy"
+    elif "emergency" in issue_description.lower() or "urgent" in issue_description.lower():
+        return "Emergency"
+    elif "teeth" in issue_description.lower() or "dentist" in issue_description.lower():
+        return "Dentist"
+    elif "rehabilitation" in issue_description.lower() or "therapy" in issue_description.lower():
+        return "Rehabilitation"
+    elif "vet" in issue_description.lower() or "animal" in issue_description.lower():
+        return "Veterinary"
+    elif "clinic" in issue_description.lower():
+        return "Clinic"
+    elif "hospital" in issue_description.lower():
+        return "Hospital"
+    else:
+        return "All Healthcare"
+
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
     params = {
@@ -140,7 +161,12 @@ latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
-show_open_only = st.checkbox("Show Open Facilities Only", value=False)
+issue_description = st.text_area("Describe the issue (optional):")
+
+if issue_description:
+    inferred_care_type = classify_issue(issue_description)
+    st.write(f"Inferred Type of Care: {inferred_care_type}")
+    care_type = inferred_care_type
 
 if use_current_location:
     current_location = get_current_location()
@@ -168,7 +194,7 @@ if st.button("Search", key="search_button"):
         st.write(f"Found {len(facilities)} facilities.")
         facilities_with_ratings = fetch_ratings_and_open_status(facilities)
 
-        if show_open_only:
+        if "show_open_only" in st.session_state and st.session_state["show_open_only"]:
             facilities_with_ratings = facilities_with_ratings[facilities_with_ratings['open_now'] == True]
 
         st.session_state["facilities"] = facilities_with_ratings
