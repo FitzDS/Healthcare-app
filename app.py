@@ -22,15 +22,16 @@ CARE_TYPES = {
 }
 
 CATEGORY_ICONS = {
-    "healthcare": "info-sign",
-    "healthcare.pharmacy": "medkit",
-    "healthcare.hospital": "plus-square",
-    "healthcare.clinic": "stethoscope",
-    "healthcare.dentist": "smile",
-    "healthcare.rehabilitation": "wheelchair",
-    "healthcare.emergency": "ambulance",
-    "healthcare.veterinary": "paw",
+    "healthcare": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Healthcare_icon.png",
+    "healthcare.pharmacy": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Pills_icon.png",
+    "healthcare.hospital": "https://upload.wikimedia.org/wikipedia/commons/1/12/Hospital_icon.png",
+    "healthcare.clinic": "https://upload.wikimedia.org/wikipedia/commons/4/45/Medical_Clinic_icon.png",
+    "healthcare.dentist": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Dental_Icon.png",
+    "healthcare.rehabilitation": "https://upload.wikimedia.org/wikipedia/commons/2/21/Rehabilitation_icon.png",
+    "healthcare.emergency": "https://upload.wikimedia.org/wikipedia/commons/4/45/Emergency_icon.png",
+    "healthcare.veterinary": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Veterinary_icon.png",
 }
+
 
 
 
@@ -165,12 +166,12 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
-            category = row.get('category', 'healthcare')
-            icon_name = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
-            print(f"Category: {category}, Icon: {icon_name}")
-            marker_color = 'blue'  # Adjust color logic as needed
+            # Fetch facility information
+            category = row.get('category', 'healthcare')  # Default to 'healthcare'
+            icon_url = CATEGORY_ICONS.get(category, CATEGORY_ICONS["healthcare"])  # Fallback to 'healthcare' icon if category not found
+            custom_icon = CustomIcon(icon_url, icon_size=(30, 30))  # Adjust size as needed
         
-            # Create popup content
+            # Prepare popup content
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
@@ -178,11 +179,11 @@ if st.button("Search", key="search_button"):
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
         
-            # Add marker with folium.Icon
+            # Add marker with the custom icon
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.Icon(icon=icon_name, color=marker_color)
+                icon=custom_icon
             ).add_to(m)
 
 
