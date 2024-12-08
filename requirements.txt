@@ -4,4 +4,4 @@ requests
 folium
 streamlit-folium
 geocoder
-openai
+openai>=1.0.0
