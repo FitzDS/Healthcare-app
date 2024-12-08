@@ -45,18 +45,19 @@ def classify_issue(issue_description):
     openai.api_key = OPENAI_API_KEY
 
     try:
-        response = openai.Chat.create(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "Classify problems into healthcare categories: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
+                {"role": "system", "content": "You are a classifier for healthcare issues. Respond with one of the following categories based on the user's input: 'All Healthcare', 'Pharmacy', 'Hospital', 'Clinic', 'Dentist', 'Rehabilitation', 'Emergency', 'Veterinary'."},
                 {"role": "user", "content": issue_description}
             ]
         )
-        # Extract content from response
-        return response['choices'][0]['message']['content']
+        # Correctly access the content in the response
+        return response.choices[0].message['content'].strip()
     except Exception as e:
         st.error(f"Error with GPT classification: {e}")
         return "All Healthcare"
+
 
 
 
