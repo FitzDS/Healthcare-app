@@ -4,7 +4,6 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
-from folium.features import DivIcon
 
 # Load API keys (replace with secure secrets management later)
 GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
@@ -21,26 +20,15 @@ CARE_TYPES = {
     "Veterinary": "healthcare.veterinary",
 }
 
-CATEGORY_ICONS = {
-    "healthcare": "fa-info-circle",
-    "healthcare.pharmacy": "fa-plus-circle",
-    "healthcare.hospital": "fa-hospital-o",
-    "healthcare.clinic": "fa-stethoscope",
-    "healthcare.dentist": "fa-user-md",
-    "healthcare.rehabilitation": "fa-wheelchair",
-    "healthcare.emergency": "fa-ambulance",
-    "healthcare.veterinary": "fa-paw",
-}
-
-
-
-
-
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
+
+# Ensure the current location marker is persistent
+if "current_location_marker" not in st.session_state:
+    st.session_state["current_location_marker"] = None
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -158,11 +146,6 @@ if st.button("Search", key="search_button"):
         st.session_state["facilities"] = facilities_with_ratings
 
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
-
-        m.get_root().html.add_child(folium.Element(
-            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
-        ))
-        
         folium.Circle(
             location=[latitude, longitude],
             radius=radius,
@@ -172,58 +155,39 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
-            category = row.get('category', 'healthcare')
-            icon_class = CATEGORY_ICONS.get(category, "fa-info-circle")  # Default to 'info-circle'
-        
-            # Determine marker color based on rating
-            rating = row['rating']
-            if rating == 'N/A' or float(rating) <= 1:
-                marker_color = 'gray'
-            elif 1 < float(rating) <= 2:
-                marker_color = 'yellow'
-            elif 2 < float(rating) <= 3:
-                marker_color = 'orange'
-            elif 3 < float(rating) <= 4:
-                marker_color = 'blue'
-            else:
-                marker_color = 'green'
-        
-            # Debugging (optional)
-            print(f"Category: {category}, Icon: {icon_class}, Color: {marker_color}")
-        
-            # Construct HTML for the icon
-            html_icon = f"""
-            <div style="color: {marker_color}; text-align: center;">
-                <i class="fa {icon_class}" style="font-size: 24px;"></i>
-            </div>
-            """
-        
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
                 f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
             )
-        
+
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=popup_content,
-                icon=DivIcon(html=html_icon)
+                popup=popup_content
             ).add_to(m)
 
+        # Add or update the marker for the user's current location with the "info-sign" icon
+        st.session_state["current_location_marker"] = folium.Marker(
+            location=[latitude, longitude],
+            popup="Current Location",
+            icon=folium.Icon(icon="info-sign", color="red")
+        )
+        st.session_state["current_location_marker"].add_to(m)
 
-
-
-    st.session_state["map"] = m
+        st.session_state["map"] = m
 
 if "map" in st.session_state and st.session_state["map"] is not None:
+    # Ensure the current location marker persists
+    if st.session_state["current_location_marker"] is not None:
+        st.session_state["current_location_marker"].add_to(st.session_state["map"])
     st_folium(st.session_state["map"], width=700, height=500)
 else:
     default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
     folium.Marker(
         location=[latitude, longitude],
         popup="Current Location",
-        icon=folium.Icon(color="red")
+        icon=folium.Icon(icon="info-sign", color="red")
     ).add_to(default_map)
     folium.Circle(
         location=[latitude, longitude],
@@ -237,22 +201,10 @@ else:
 # Add legend for marker colors and icons
 st.markdown("""### Legend
 - **Red Marker**: Current Location
-- **Icons**:
-  - 🏥 Hospital
-  - 💊 Pharmacy
-  - 🦷 Dentist
-  - 🐾 Veterinary
-  - 🩺 Clinic
-  - 🚑 Emergency
-  - 🚶 Rehabilitation
 - **Rating Colors**:
   - **Green**: 4-5 Stars
   - **Blue**: 3-4 Stars
   - **Orange**: 2-3 Stars
   - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
-""")
 
-# Show data in a table if facilities exist
-if "facilities" in st.session_state and not st.session_state["facilities"].empty:
-    st.dataframe(st.session_state["facilities"])
+
