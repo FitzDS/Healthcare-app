@@ -205,12 +205,10 @@ if st.button("Search", key="search_button"):
 
 # Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
+    # Ensure the current location marker persists
     if st.session_state["current_location_marker"] is not None:
-        # Add the persistent current location marker
         st.session_state["current_location_marker"].add_to(st.session_state["map"])
-    
-    # Render the map only once
-    map_html = st_folium(st.session_state["map"], width=700, height=500)
+    st_folium(st.session_state["map"], width=700, height=500)
 else:
     default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
     folium.Marker(
@@ -225,5 +223,4 @@ else:
         fill=True,
         fill_opacity=0.4
     ).add_to(default_map)
-    map_html = st_folium(default_map, width=700, height=500)
-
+    st_folium(default_map, width=700, height=500)
