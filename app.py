@@ -156,6 +156,7 @@ if st.button("Search", key="search_button"):
         facilities_with_ratings = fetch_ratings_for_existing_places(facilities)
         st.session_state["facilities"] = facilities_with_ratings
 
+        # Only regenerate the map when new data is fetched
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
@@ -202,6 +203,7 @@ if st.button("Search", key="search_button"):
 
         st.session_state["map"] = m
 
+# Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
     # Ensure the current location marker persists
     if st.session_state["current_location_marker"] is not None:
