@@ -88,7 +88,7 @@ def get_current_location():
 
 st.title("Healthcare Facility Locator")
 
-# Input options
+# Input options (Search above the map)
 location_query = st.text_input("Search by Location:")
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
@@ -116,12 +116,18 @@ if use_current_location:
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
 # Default map preview
+st.write("Legend: 
+Red: Current Location 
+Green: 4-5 Stars 
+Orange: 3-4 Stars 
+Yellow: 1-2 Stars 
+Gray: Unrated")
 st.write("Default Map Preview:")
 default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
 folium.Marker(
     location=[latitude, longitude],
     popup="Current Location",
-    icon=folium.Icon(color="red")
+    icon=folium.Icon(color="darkred")
 ).add_to(default_map)
 folium.Marker(
     location=[latitude, longitude],
@@ -158,6 +164,20 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities.iterrows():
+            # Determine marker color based on rating
+            rating = row['rating']
+            if rating == 'N/A' or float(rating) <= 1:
+                marker_color = 'gray'
+            elif 1 < float(rating) <= 2:
+                marker_color = 'yellow'
+            elif 2 < float(rating) <= 3:
+                marker_color = 'orange'
+            elif 3 < float(rating) <= 4:
+                marker_color = 'blue'
+            else:
+                marker_color = 'green'
+
+            # Add marker with the determined color
             destination = (row["latitude"], row["longitude"])
             distance, duration = get_travel_time_distance((latitude, longitude), destination)
 
