@@ -24,12 +24,13 @@ CATEGORY_ICONS = {
     "healthcare": "info-sign",
     "healthcare.pharmacy": "medkit",
     "healthcare.hospital": "plus-square",
-    "healthcare.clinic": "user-md",
+    "healthcare.clinic": "stethoscope",
     "healthcare.dentist": "smile",
-    "healthcare.rehabilitation": "male",
+    "healthcare.rehabilitation": "wheelchair",
     "healthcare.emergency": "ambulance",
     "healthcare.veterinary": "paw",
 }
+
 
 
 # Initialize session state for map and facilities
@@ -164,7 +165,7 @@ if st.button("Search", key="search_button"):
 
         for _, row in facilities_with_ratings.iterrows():
             rating = row['rating']
-            category = row['category']
+            category = row.get('category', 'healthcare')
             icon = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
         
             popup_content = (
