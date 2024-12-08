@@ -41,7 +41,8 @@ def classify_issue(issue_description):
     import openai
 
     # Your OpenAI API key
-    openai.api_key = "your-openai-api-key"
+    
+    openai.api_key = st.secrets["api_keys"]["openai"]
 
     try:
         # Legacy usage for openai<1.0.0
