@@ -22,15 +22,16 @@ CARE_TYPES = {
 }
 
 CATEGORY_ICONS = {
-    "healthcare": "info-sign",           # Generic info icon
-    "healthcare.pharmacy": "medkit",    # Pharmacy
-    "healthcare.hospital": "plus-square",  # Hospital
-    "healthcare.clinic": "stethoscope", # Clinic
-    "healthcare.dentist": "user-md",    # Dentist
-    "healthcare.rehabilitation": "wheelchair", # Rehabilitation
-    "healthcare.emergency": "ambulance", # Emergency
-    "healthcare.veterinary": "paw",     # Veterinary
+    "healthcare": "fa-info-circle",
+    "healthcare.pharmacy": "fa-plus-circle",
+    "healthcare.hospital": "fa-hospital-o",
+    "healthcare.clinic": "fa-stethoscope",
+    "healthcare.dentist": "fa-user-md",
+    "healthcare.rehabilitation": "fa-wheelchair",
+    "healthcare.emergency": "fa-ambulance",
+    "healthcare.veterinary": "fa-paw",
 }
+
 
 
 
@@ -166,21 +167,15 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities_with_ratings.iterrows():
-            category = row.get('category', 'healthcare')  # Default to 'healthcare'
-            icon_name = CATEGORY_ICONS.get(category, 'medkit')  # Default to 'info-sign'
+            category = row.get('category', 'healthcare')
+            icon_class = CATEGORY_ICONS.get(category, "fa-info-circle")  # Default to 'info-circle'
         
-            # Determine marker color based on rating
-            rating = row['rating']
-            if rating == 'N/A' or float(rating) <= 1:
-                marker_color = 'gray'
-            elif 1 < float(rating) <= 2:
-                marker_color = 'yellow'
-            elif 2 < float(rating) <= 3:
-                marker_color = 'orange'
-            elif 3 < float(rating) <= 4:
-                marker_color = 'blue'
-            else:
-                marker_color = 'green'
+            # Prepare HTML content for the marker
+            html_icon = f"""
+            <div style="color: {marker_color}; text-align: center;">
+                <i class="fa {icon_class}" style="font-size: 24px;"></i>
+            </div>
+            """
         
             popup_content = (
                 f"<b>{row['name']}</b><br>"
@@ -192,8 +187,9 @@ if st.button("Search", key="search_button"):
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
                 popup=popup_content,
-                icon=folium.Icon(icon=icon_name, color=marker_color)  # Dynamic FontAwesome icon and color
+                icon=folium.DivIcon(html=html_icon)
             ).add_to(m)
+
 
 
 
