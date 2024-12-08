@@ -168,6 +168,9 @@ if st.button("Search", key="search_button"):
             category = row.get('category', 'healthcare')
             icon = CATEGORY_ICONS.get(category, 'info-sign')  # Default to 'info-sign'
         
+            # Debugging
+            print(f"Category: {category}, Icon: {icon}")
+        
             popup_content = (
                 f"<b>{row['name']}</b><br>"
                 f"Address: {row['address']}<br>"
@@ -191,6 +194,7 @@ if st.button("Search", key="search_button"):
                 popup=popup_content,
                 icon=folium.Icon(icon=icon, color=marker_color)
             ).add_to(m)
+
 
 
         st.session_state["map"] = m
