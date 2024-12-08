@@ -21,15 +21,16 @@ CARE_TYPES = {
 }
 
 CATEGORY_ICONS = {
-    "healthcare": "hospital-symbol",
-    "healthcare.pharmacy": "capsules",
-    "healthcare.hospital": "clinic-medical",
-    "healthcare.clinic": "stethoscope",
-    "healthcare.dentist": "tooth",
-    "healthcare.rehabilitation": "walking",
+    "healthcare": "info-sign",
+    "healthcare.pharmacy": "medkit",
+    "healthcare.hospital": "plus-square",
+    "healthcare.clinic": "user-md",
+    "healthcare.dentist": "smile",
+    "healthcare.rehabilitation": "male",
     "healthcare.emergency": "ambulance",
     "healthcare.veterinary": "paw",
 }
+
 
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
