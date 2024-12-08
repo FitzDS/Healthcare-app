@@ -21,42 +21,6 @@ CARE_TYPES = {
     "Veterinary": "healthcare.veterinary",
 }
 
-
-if st.button("Search"):
-    st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
-
-    if facilities.empty:
-        st.write("No facilities found. Try adjusting your search parameters.")
-    else:
-        st.write(f"Found {len(facilities)} facilities.")
-
-        # Create map
-        m = folium.Map(location=[latitude, longitude], zoom_start=12)
-
-        for _, row in facilities.iterrows():
-            destination = (row["latitude"], row["longitude"])
-            distance, duration = get_travel_time_distance((latitude, longitude), destination)
-
-            popup_content = (
-                f"<b>{row['name']}</b><br>"
-                f"Address: {row['address']}<br>"
-                f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
-                f"Distance: {distance}<br>"
-                f"Travel Time: {duration}<br>"
-                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
-            )
-
-            folium.Marker(
-                location=[row["latitude"], row["longitude"]],
-                popup=popup_content,
-            ).add_to(m)
-
-        # Render map in Streamlit
-        rendered_map = st_folium(m, width=700, height=500)
-
-
-
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
     params = {
@@ -126,7 +90,7 @@ st.title("Healthcare Facility Locator")
 
 # Input options
 location_query = st.text_input("Search by Location:")
-use_current_location = st.button("Use Current Location")
+use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=1000, max_value=200000, step=1000, value=50000)
@@ -147,7 +111,7 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
-if st.button("Search"):
+if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
 
