@@ -52,10 +52,12 @@ def classify_issue(issue_description):
                 {"role": "user", "content": issue_description}
             ]
         )
-        return response['choices'][0]['message']['content']
+        # Access the content of the response correctly in the new version
+        return response.choices[0].message.content
     except Exception as e:
         st.error(f"Error with GPT classification: {e}")
         return "All Healthcare"
+
 
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
