@@ -31,7 +31,14 @@ translations = {
         "radius": "Search Radius (meters):",
         "care_type": "Type of Care:",
         "show_open_only": "Show Open Facilities Only",
-        "legend": "Legend",
+        "legend_title": "Legend",
+        "legend_current_location": "Red Marker: Current Location",
+        "legend_rating_colors": "Rating Colors:",
+        "legend_green": "Green: 4-5 Stars",
+        "legend_blue": "Blue: 3-4 Stars",
+        "legend_orange": "Orange: 2-3 Stars",
+        "legend_yellow": "Yellow: 1-2 Stars",
+        "legend_gray": "Gray: Unrated or 0-1 Stars",
         "found_facilities": "Found {} facilities.",
         "no_facilities": "No facilities found. Check your API key, location, or radius.",
         "open_now": "Open Now",
@@ -46,13 +53,21 @@ translations = {
         "radius": "Radio de Búsqueda (metros):",
         "care_type": "Tipo de Atención:",
         "show_open_only": "Mostrar solo Centros Abiertos",
-        "legend": "Leyenda",
+        "legend_title": "Leyenda",
+        "legend_current_location": "Marcador Rojo: Ubicación Actual",
+        "legend_rating_colors": "Colores de Calificación:",
+        "legend_green": "Verde: 4-5 Estrellas",
+        "legend_blue": "Azul: 3-4 Estrellas",
+        "legend_orange": "Naranja: 2-3 Estrellas",
+        "legend_yellow": "Amarillo: 1-2 Estrellas",
+        "legend_gray": "Gris: Sin Calificar o 0-1 Estrellas",
         "found_facilities": "Se encontraron {} centros.",
         "no_facilities": "No se encontraron centros. Verifique su clave API, ubicación o radio.",
         "open_now": "Abierto Ahora",
         "directions": "Obtener Indicaciones",
     },
 }
+
 
 # Select language
 selected_language = st.selectbox("Choose Language / Seleccione el idioma:", options=["en", "es"])
@@ -125,15 +140,16 @@ def fetch_ratings_and_open_status(facilities_df):
 st.title(lang["title"])
 
 # Add legend above the map
-st.markdown(f"""### {lang['legend']}
-- **Red Marker**: Current Location
-- **Rating Colors**:
-  - **Green**: 4-5 Stars
-  - **Blue**: 3-4 Stars
-  - **Orange**: 2-3 Stars
-  - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
+st.markdown(f"""### {lang['legend_title']}
+- **{lang['legend_current_location']}**
+- **{lang['legend_rating_colors']}**
+  - **{lang['legend_green']}**
+  - **{lang['legend_blue']}**
+  - **{lang['legend_orange']}**
+  - **{lang['legend_yellow']}**
+  - **{lang['legend_gray']}**
 """)
+
 
 location_query = st.text_input(lang["search_location"])
 use_current_location = st.button(lang["use_current_location"], key="current_location_button")
