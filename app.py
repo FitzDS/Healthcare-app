@@ -111,6 +111,11 @@ if use_current_location:
     longitude = current_location[1]
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
+# Initialize a default map preview
+default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+st_folium(default_map, width=700, height=500)
+
+# Handle the search functionality
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
@@ -120,7 +125,7 @@ if st.button("Search", key="search_button"):
     else:
         st.write(f"Found {len(facilities)} facilities.")
 
-        # Create map
+        # Create a map with search results
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
 
         for _, row in facilities.iterrows():
@@ -141,8 +146,9 @@ if st.button("Search", key="search_button"):
                 popup=popup_content,
             ).add_to(m)
 
-        # Render map in Streamlit
+        # Render the map in Streamlit
         st_folium(m, width=700, height=500)
 
-        # Show data in a table
+        # Display the search results in a table
         st.dataframe(facilities)
+
