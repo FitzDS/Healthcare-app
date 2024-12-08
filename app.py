@@ -206,8 +206,7 @@ folium.Circle(
         color="blue",
         fill=True,
         fill_opacity=0.4
-    ).add_to(default_map)
-    st_folium(default_map, width=700, height=500)
+    ).add_to(default_map)st_folium(default_map, width=700, height=500)
 
 # Add a legend for the map
 st.markdown("""### Legend
