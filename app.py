@@ -116,12 +116,12 @@ if use_current_location:
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
 
 # Default map preview
-st.write("Legend: 
-Red: Current Location 
-Green: 4-5 Stars 
-Orange: 3-4 Stars 
-Yellow: 1-2 Stars 
-Gray: Unrated")
+st.markdown("""### Legend
+- **Red**: Current Location
+- **Green**: 4-5 Stars
+- **Orange**: 3-4 Stars
+- **Yellow**: 1-2 Stars
+- **Gray**: Unrated""")
 st.write("Default Map Preview:")
 default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
 folium.Marker(
