@@ -117,6 +117,10 @@ def fetch_ratings_and_open_status(facilities_df):
             'locationbias': f"point:{facility['latitude']},{facility['longitude']}",
             'key': GOOGLE_API_KEY
         }
+        facility['opening_hours'] = candidate.get('opening_hours', {}).get('weekday_text', [])
+        hours = "<br>".join(row['opening_hours']) if row['opening_hours'] else "N/A"
+
+
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
@@ -216,6 +220,7 @@ if st.button("Search", key="search_button"):
                 f"Address: {row['address']}<br>"
                 f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
                 f"{lang['open_now']}: {'Yes' if row['open_now'] else 'No'}<br>"
+                f"Hours:<br>{hours}<br>"
                 f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}&hl={selected_language}' target='_blank'>{lang['directions']}</a>"
             )
 
