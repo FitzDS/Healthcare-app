@@ -97,7 +97,7 @@ wheelchair_filter = st.checkbox("Show only wheelchair-accessible facilities")
 
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
-    Fetch healthcare data using Google Places API with wheelchair accessibility logic.
+    Fetch healthcare data using Google Places API with debugging for wheelchair accessibility.
 
     Args:
         latitude (float): Latitude of the search center.
@@ -112,7 +112,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
 
-    # Handle multiple types for "All Healthcare"
     if isinstance(care_type, list):
         types_to_query = care_type
     else:
@@ -128,13 +127,13 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
         while True:
             response = requests.get(url, params=params)
+            st.write("Raw API Response:", response.json())  # Debugging step
             if response.status_code == 200:
                 data = response.json()
                 for result in data.get("results", []):
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
-                    # Extract accessibility options
                     accessibility = result.get("accessibility", {})
                     wheelchair_accessible = all([
                         accessibility.get("wheelchairAccessibleEntrance", None) is True,
@@ -154,11 +153,10 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "wheelchair_accessible": wheelchair_accessible,
                     })
 
-                # Check for the next page token
                 next_page_token = data.get("next_page_token")
                 if next_page_token:
                     import time
-                    time.sleep(2)  # Pause to let the token activate (required by API)
+                    time.sleep(2)
                     params = {"pagetoken": next_page_token, "key": GOOGLE_API_KEY}
                 else:
                     break
