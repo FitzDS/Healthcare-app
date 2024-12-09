@@ -71,7 +71,7 @@ def classify_issue_with_openai(issue_description):
         return "Error"
 
 
-def enhance_facility_with_google_data(facility):
+def enhance_facility_data_with_google(facility):
     """
     Enhance facility details using Google Places API.
     """
@@ -83,19 +83,27 @@ def enhance_facility_with_google_data(facility):
         "key": GOOGLE_API_KEY,
     }
     response = requests.get("https://maps.googleapis.com/maps/api/place/findplacefromtext/json", params=params)
+
+    # Check for successful API response
     if response.status_code == 200:
         data = response.json()
-        if data.get("candidates"):
-            candidate = data["candidates"][0]
-            facility["address"] = candidate.get("formatted_address", facility.get("address", "N/A"))
-            facility["rating"] = candidate.get("rating", facility.get("rating", "No rating"))
-            facility["user_ratings_total"] = candidate.get("user_ratings_total", facility.get("user_ratings_total", 0))
-            facility["open_now"] = candidate.get("opening_hours", {}).get("open_now", facility.get("open_now", "Unknown"))
-        else:
-            st.warning(f"No matching data found for {query} via Google API.")
+
+        # Handle cases where no candidates are found
+        if not data.get("candidates"):
+            st.warning(f"No matching data found for {query}")
+            return facility  # Return the original facility data
+
+        # Enhance facility with first matching candidate's data
+        candidate = data["candidates"][0]
+        facility["address"] = candidate.get("formatted_address", facility.get("address", "N/A"))
+        facility["rating"] = candidate.get("rating", facility.get("rating", "No rating"))
+        facility["user_ratings_total"] = candidate.get("user_ratings_total", facility.get("user_ratings_total", 0))
+        facility["open_now"] = candidate.get("opening_hours", {}).get("open_now", facility.get("open_now", "Unknown"))
     else:
         st.error(f"Google API error: {response.status_code}")
+    
     return facility
+
 
 
 
@@ -229,6 +237,13 @@ if st.button("Search", key="search_button"):
         for _, row in facilities.iterrows():
             # Convert row to dictionary and enhance it
             facility = row.to_dict()
+            for facility in facilities:
+                if not facility.get("name"):
+                    st.error(f"Facility missing name: {facility}")
+                    continue
+                if "latitude" not in facility or "longitude" not in facility:
+                    st.error(f"Facility missing coordinates: {facility}")
+                    continue
             enhanced_facility = enhance_facility_data_with_google(facility)
             
             # Determine marker color based on rating
