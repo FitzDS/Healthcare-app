@@ -206,6 +206,8 @@ issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
 st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
+filter_wheelchair_accessible = st.checkbox("Show only wheelchair accessible entrances", value=False)
+
 
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
@@ -240,6 +242,8 @@ elif location_query:
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
+
+
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     # Fetch facilities using Google API
@@ -250,7 +254,9 @@ if st.button("Search", key="search_button"):
         care_type=CARE_TYPES.get(care_type, "hospital"),
         open_only=open_only
     )
-    
+
+    if filter_wheelchair_accessible:
+        facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
@@ -272,6 +278,7 @@ if not facilities.empty:
         **{row['name']}**
         - Address: {row['address']}
         - Rating: {row['rating']} ⭐
+        - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
         - Distance: {row.get('distance', 'N/A')} km
         [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
         """)
