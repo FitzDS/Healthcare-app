@@ -275,17 +275,23 @@ if st.button("Search", key="search_button"):
                     color = "yellow"
             
             # Add marker to the map
-            folium.Marker(
-                location=[enhanced_facility["latitude"], enhanced_facility["longitude"]],
-                popup=f"""
-                    <b>{enhanced_facility.get('name', 'Unknown')}</b><br>
-                    Address: {enhanced_facility.get('address', 'N/A')}<br>
-                    Open Now: {enhanced_facility.get('open_now', 'Unknown')}<br>
-                    Rating: {enhanced_facility.get('rating', 'No rating')} ({enhanced_facility.get('user_ratings_total', '0')} reviews)<br>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
-                """,
-                icon=folium.Icon(color=color)
-            ).add_to(m)
+           for facility in facilities_data:  # facilities_data is the list of fetched facilities
+                # Validate the facility before processing
+                if not isinstance(facility, dict) or not facility.get("name"):
+                    st.warning(f"Skipping invalid facility data: {facility}")
+                    continue
+            
+                # Proceed with valid facility
+                folium.Marker(
+                    location=[facility["latitude"], facility["longitude"]],
+                    popup=f"""
+                        <b>{facility['name']}</b><br>
+                        Address: {facility['address']}<br>
+                        Rating: {facility['rating']} ({facility['user_ratings_total']} reviews)<br>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={facility['latitude']},{facility['longitude']}" target="_blank">Get Directions</a>
+                    """,
+                    icon=folium.Icon(color="blue"),
+                ).add_to(m)
 
 
         st.session_state["map"] = m
