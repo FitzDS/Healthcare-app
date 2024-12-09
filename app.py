@@ -96,7 +96,7 @@ def classify_issue_with_openai_cached(issue_description):
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare data using Google Places API with support for multiple healthcare categories.
-    Now also checks for wheelchair accessibility.
+    Now also checks for wheelchair accessibility using types.
     """
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
@@ -122,16 +122,25 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
-                    # Fetch additional details for wheelchair accessibility
+                    # Fetch additional details to check for wheelchair accessibility
                     place_details_url = "https://maps.googleapis.com/maps/api/place/details/json"
                     place_params = {
                         "place_id": result["place_id"],
                         "key": GOOGLE_API_KEY
                     }
                     details_response = requests.get(place_details_url, params=place_params)
+                    wheelchair_accessible = False  # Default to False
                     if details_response.status_code == 200:
                         details_data = details_response.json()
-                        wheelchair_accessible = "wheelchair_accessible" in details_data.get("result", {}).get("types", [])
+
+                        # Try to check for wheelchair accessible types
+                        place_types = details_data.get("result", {}).get("types", [])
+                        if "wheelchair_accessible" in place_types:
+                            wheelchair_accessible = True
+                        else:
+                            # You can check for other related terms in the types list (e.g., "accessible")
+                            if any("accessible" in t.lower() for t in place_types):
+                                wheelchair_accessible = True
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
