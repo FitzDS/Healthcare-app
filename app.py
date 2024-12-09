@@ -239,7 +239,7 @@ if st.button("Search", key="search_button"):
     )
     
         # Store the fetched facilities in session state
-        st.session_state["facilities"] = facilities
+    st.session_state["facilities"] = facilities
     
     # Retrieve facilities from session state
     facilities = st.session_state["facilities"]
