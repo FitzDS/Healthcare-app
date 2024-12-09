@@ -96,7 +96,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
                 "wheelchair": properties.get("wheelchair", "unknown"),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "unknown"),
+                "open_now": properties.get("opening_hours", {}).get("open_now", "unknown") if isinstance(properties.get("opening_hours"), dict) else "unknown",
                 "rating": properties.get("rating", "N/A"),
                 "user_ratings_total": properties.get("user_ratings_total", 0),
             }
@@ -105,6 +105,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
