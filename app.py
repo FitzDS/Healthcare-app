@@ -36,9 +36,10 @@ if "facilities" not in st.session_state:
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
 
-def classify_issue_with_openai(issue_description):
+@st.cache_data
+def classify_issue_with_openai_cached(issue_description):
     """
-    Classifies a healthcare issue description using OpenAI's API.
+    Classifies a healthcare issue description using OpenAI's API and caches the result.
 
     Args:
         issue_description (str): The description of the issue.
@@ -49,6 +50,13 @@ def classify_issue_with_openai(issue_description):
     prompt = f"""
     You are an expert in healthcare classification. Classify the following issue description into one of these categories:
     {', '.join(CARE_TYPES.keys())}.
+
+    Examples:
+    - "I need medication for my cold" -> Pharmacy
+    - "I broke my arm and need treatment" -> Hospital
+    - "My dog needs a checkup" -> Veterinary
+    - "I need help recovering from a sports injury" -> Physiotherapist
+    - "I need dental work" -> Dentist
 
     Issue: {issue_description}
     Category:"""
@@ -165,7 +173,7 @@ st.markdown(f"""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=7500, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
+radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=20000, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
@@ -181,7 +189,7 @@ longitude = st.number_input("Longitude", value=-121.7405)
 
 # Infer care type if issue description is provided
 if issue_description and not care_type:
-    inferred_care_type = classify_issue_with_openai(issue_description)
+    inferred_care_type = classify_issue_with_openai_cached(issue_description)
     if inferred_care_type in CARE_TYPES:
         care_type = inferred_care_type
         st.success(f"Inferred Type of Care: {care_type}")
@@ -231,44 +239,5 @@ if st.button("Search", key="search_button"):
             color = "gray"  # Default color for unrated
             if row["rating"] != "No rating" and row["rating"]:
                 if float(row["rating"]) >= 4:
-                    color = "green"
-                elif float(row["rating"]) >= 3:
-                    color = "blue"
-                elif float(row["rating"]) >= 2:
-                    color = "orange"
-                elif float(row["rating"]) >= 1:
-                    color = "yellow"
-
-            folium.Marker(
-                location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
-                icon=folium.Icon(color=color)
-            ).add_to(m)
-
-        folium.Marker(
-            location=[latitude, longitude],
-            popup="Current Location",
-            icon=folium.Icon(icon="info-sign", color="red")
-        ).add_to(m)
-
-        st.session_state["map"] = m
-
-if "map" in st.session_state and st.session_state["map"] is not None:
-    st_folium(st.session_state["map"], width=700, height=500)
-else:
-    default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(icon="info-sign", color="red")
-    ).add_to(default_map)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(default_map)
-    st_folium(default_map, width=700, height=500)
-
+                    color = "gr
 
