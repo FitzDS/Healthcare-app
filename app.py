@@ -237,9 +237,13 @@ if st.button("Search", key="search_button"):
     # Sidebar with sorted list of locations
     st.sidebar.title("Nearby Locations")
     if not facilities.empty:
-        # Sort facilities by distance or rating (modify based on available data)
+        # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
+        facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
+    
+        # Sort facilities by rating (descending)
         sorted_facilities = facilities.sort_values(by="rating", ascending=False)
     
+        # Populate sidebar with sorted facilities
         for _, row in sorted_facilities.iterrows():
             st.sidebar.markdown(f"""
             **{row['name']}**
