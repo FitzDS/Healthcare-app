@@ -65,14 +65,11 @@ def classify_issue_with_openai(issue_description):
             max_tokens=50,
             temperature=0
         )
-        # Correct way to access the response
-        category = response.choices[0].message.content.strip()
+        category = response["choices"][0]["message"]["content"].strip()
         return category
     except Exception as e:
         st.error(f"Error during classification: {e}")
         return "Error"
-
-
 
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
@@ -138,7 +135,9 @@ st.markdown(f"""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
+radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 issue_description = st.text_area("Describe the issue (optional):")
+care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
@@ -148,8 +147,6 @@ else:
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
-care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 
 # Infer care type if issue description is provided
 if issue_description and not care_type:
