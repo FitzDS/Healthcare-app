@@ -6,13 +6,12 @@ from streamlit_folium import st_folium
 import folium
 from openai import Client
 
-# Load API keys (replace with secure secrets management later)
+# Set up OpenAI client
+client = Client(api_key=st.secrets["api_keys"]["openai"])
+
+# Load API keys from Streamlit secrets
 GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
-OPENAI_API_KEY = st.secrets["api_keys"]["openai"]
-
-# Initialize OpenAI client
-client = Client(api_key=OPENAI_API_KEY)
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
@@ -39,25 +38,39 @@ if "facilities" not in st.session_state:
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
 
-def classify_issue(issue_description):
+
+def classify_issue_with_openai(issue_description):
     """
-    Use OpenAI's API to classify an issue description into one of the CARE_TYPES categories.
+    Classifies a healthcare issue description using OpenAI's API.
+
+    Args:
+        issue_description (str): The description of the issue.
+
+    Returns:
+        str: Predicted healthcare category.
     """
+    prompt = f"""
+    You are an expert in healthcare classification. Classify the following issue description into one of these categories:
+    {', '.join(CARE_TYPES.keys())}.
+
+    Issue: {issue_description}
+    Category:"""
     try:
-        response = client.chat_completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are an assistant trained to classify healthcare-related issues into predefined categories: All Healthcare, Pharmacy, Hospital, Clinic, Dentist, Rehabilitation, Emergency, Veterinary."},
-                {"role": "user", "content": f"Issue: {issue_description}\nClassify this issue into one of the categories."}
+                {"role": "system", "content": "You are a healthcare classification assistant."},
+                {"role": "user", "content": prompt}
             ],
             max_tokens=50,
             temperature=0
         )
-        classification = response["choices"][0]["message"]["content"]
-        return classification.strip()
+        category = response["choices"][0]["message"]["content"].strip()
+        return category
     except Exception as e:
         st.error(f"Error during classification: {e}")
-        return "All Healthcare"
+        return "Error"
+
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -79,7 +92,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "address": properties.get("formatted", "N/A"),
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
-                "category": properties.get("categories", ["healthcare"])[0]
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
@@ -87,41 +99,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
 
-def fetch_ratings_and_open_status(facilities_df):
-    updated_facilities = []
-
-    for _, facility in facilities_df.iterrows():
-        url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
-        params = {
-            'input': facility['name'],
-            'inputtype': 'textquery',
-            'fields': 'rating,user_ratings_total,opening_hours',
-            'locationbias': f"point:{facility['latitude']},{facility['longitude']}",
-            'key': GOOGLE_API_KEY
-        }
-
-        response = requests.get(url, params=params)
-
-        if response.status_code == 200:
-            data = response.json()
-            if data.get('candidates'):
-                candidate = data['candidates'][0]
-                facility['rating'] = candidate.get('rating', 'N/A')
-                facility['user_ratings_total'] = candidate.get('user_ratings_total', 0)
-                facility['open_now'] = candidate.get('opening_hours', {}).get('open_now', 'N/A')
-            else:
-                facility['rating'] = 'N/A'
-                facility['user_ratings_total'] = 0
-                facility['open_now'] = 'N/A'
-        else:
-            st.error(f"Error fetching ratings for {facility['name']}: {response.status_code}")
-            facility['rating'] = 'N/A'
-            facility['user_ratings_total'] = 0
-            facility['open_now'] = 'N/A'
-
-        updated_facilities.append(facility)
-
-    return pd.DataFrame(updated_facilities)
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -135,6 +112,7 @@ def get_lat_lon_from_query(query):
     st.error("Location not found. Please try again.")
     return None, None
 
+
 def get_current_location():
     g = geocoder.ip('me')
     if g.ok:
@@ -142,10 +120,11 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
 
+
 st.title("Healthcare Facility Locator")
 
 # Add legend above the map
-st.markdown("""### Legend
+st.markdown(f"""### Legend
 - **Red Marker**: Current Location
 - **Rating Colors**:
   - **Green**: 4-5 Stars
@@ -156,6 +135,8 @@ st.markdown("""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
+issue_description = st.text_area("Describe the issue (optional):")
+
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
 else:
@@ -165,19 +146,17 @@ use_current_location = st.button("Use Current Location", key="current_location_b
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
-care_type = st.selectbox("Type of Care (Leave blank to auto-detect):", options=["Select Care Type"] + list(CARE_TYPES.keys()))
+care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 
-if care_type == "Select Care Type":
-    st.caption("Tip: Describe the issue below to automatically determine the care type.")
-
-issue_description = st.text_area("Describe the issue (optional):")
-if issue_description:
-    inferred_care_type = classify_issue(issue_description)
-    if care_type == "Select Care Type":
+# Infer care type if issue description is provided
+if issue_description and not care_type:
+    inferred_care_type = classify_issue_with_openai(issue_description)
+    if inferred_care_type in CARE_TYPES:
         care_type = inferred_care_type
-        st.write(f"Inferred Type of Care: {inferred_care_type}")
+        st.success(f"Inferred Type of Care: {care_type}")
     else:
-        st.warning("Manual selection of care type takes precedence over automatic detection.")
+        st.warning("Could not classify issue; defaulting to All Healthcare.")
+        care_type = "All Healthcare"
 
 if use_current_location:
     current_location = get_current_location()
@@ -200,17 +179,8 @@ if st.button("Search", key="search_button"):
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
-        st.session_state["facilities"] = pd.DataFrame()
     else:
         st.write(f"Found {len(facilities)} facilities.")
-        facilities_with_ratings = fetch_ratings_and_open_status(facilities)
-
-        if show_open_only:
-            facilities_with_ratings = facilities_with_ratings[facilities_with_ratings['open_now'] == True]
-
-        st.session_state["facilities"] = facilities_with_ratings
-
-        # Only regenerate the map when new data is fetched
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
@@ -220,45 +190,21 @@ if st.button("Search", key="search_button"):
             fill_opacity=0.4
         ).add_to(m)
 
-        for _, row in facilities_with_ratings.iterrows():
-            # Determine marker color based on rating
-            rating = row['rating']
-            if rating == 'N/A' or float(rating) <= 1:
-                marker_color = 'gray'
-            elif 1 < float(rating) <= 2:
-                marker_color = 'yellow'
-            elif 2 < float(rating) <= 3:
-                marker_color = 'orange'
-            elif 3 < float(rating) <= 4:
-                marker_color = 'blue'
-            else:
-                marker_color = 'green'
-
-            popup_content = (
-                f"<b>{row['name']}</b><br>"
-                f"Address: {row['address']}<br>"
-                f"Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>"
-                f"Open Now: {'Yes' if row['open_now'] else 'No'}<br>"
-                f"<a href='https://www.google.com/maps/dir/?api=1&origin={latitude},{longitude}&destination={row['latitude']},{row['longitude']}' target='_blank'>Get Directions</a>"
-            )
-
+        for _, row in facilities.iterrows():
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=popup_content,
-                icon=folium.Icon(color=marker_color)
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}",
+                icon=folium.Icon(color="blue")
             ).add_to(m)
 
-        # Add or update the marker for the user's current location with the "info-sign" icon
-        st.session_state["current_location_marker"] = folium.Marker(
+        folium.Marker(
             location=[latitude, longitude],
             popup="Current Location",
             icon=folium.Icon(icon="info-sign", color="red")
-        )
-        st.session_state["current_location_marker"].add_to(m)
+        ).add_to(m)
 
         st.session_state["map"] = m
 
-# Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
     st_folium(st.session_state["map"], width=700, height=500)
 else:
@@ -266,7 +212,7 @@ else:
     folium.Marker(
         location=[latitude, longitude],
         popup="Current Location",
-        icon=folium.Icon(icon="info-sign",color="red")
+        icon=folium.Icon(icon="info-sign", color="red")
     ).add_to(default_map)
     folium.Circle(
         location=[latitude, longitude],
@@ -276,3 +222,4 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
