@@ -223,7 +223,7 @@ if st.button("Search"):
         
             popup_content = f"""
                 <b>{row['name']}</b><br>
-                {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
+                {t('search_by_location')}: {row['address']}<br>
                 Open Now: {row['open_now']}<br>
                 Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
                 <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
@@ -234,6 +234,7 @@ if st.button("Search"):
                 popup=popup_content,
                 icon=folium.Icon(color=color)
             ).add_to(m)
+
 
 
         st.session_state["map"] = m
