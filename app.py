@@ -205,10 +205,9 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
-st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 filter_wheelchair_accessible = st.checkbox("Show only wheelchair accessible entrances", value=False)
 
-
+st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
