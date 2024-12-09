@@ -65,12 +65,13 @@ def classify_issue_with_openai(issue_description):
             max_tokens=50,
             temperature=0
         )
-        # Extract the content of the first choice using the appropriate syntax
-        category = response.choices[0].message["content"].strip()
+        # Correct way to access the response
+        category = response.choices[0].message.content.strip()
         return category
     except Exception as e:
         st.error(f"Error during classification: {e}")
         return "Error"
+
 
 
 
