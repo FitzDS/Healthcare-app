@@ -243,10 +243,10 @@ if st.button("Search", key="search_button"):
     )
 
     if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
+        st.error(translate("no_facilities_found"))
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
-        st.write(f"Found {len(facilities)} facilities.")
+        st.write(f"{translate('inferred_care_type')} {len(facilities)}")
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
@@ -255,8 +255,9 @@ if st.button("Search", key="search_button"):
             fill=True,
             fill_opacity=0.4
         ).add_to(m)
-
+    
         for _, row in facilities.iterrows():
+            # Assign a color based on ratings
             color = "gray"  # Default color for unrated
             if row["rating"] != "No rating" and row["rating"]:
                 if float(row["rating"]) >= 4:
@@ -267,13 +268,25 @@ if st.button("Search", key="search_button"):
                     color = "orange"
                 elif float(row["rating"]) >= 1:
                     color = "yellow"
-
+    
+            # Generate the directions link
+            directions_link = f"https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}"
+    
+            # Add marker with "Get Directions" link
+            popup_content = f"""
+            <b>{row['name']}</b><br>
+            Address: {row['address']}<br>
+            Open Now: {row['open_now']}<br>
+            Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
+            <a href="{directions_link}" target="_blank">Get Directions</a>
+            """
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                popup=folium.Popup(popup_content, max_width=300),
                 icon=folium.Icon(color=color)
             ).add_to(m)
-
+    
+        # Add current location marker
         folium.Marker(
             location=[latitude, longitude],
             popup="Current Location",
