@@ -11,7 +11,6 @@ client = Client(api_key=st.secrets["api_keys"]["openai"])
 
 # Load API keys from Streamlit secrets
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
-GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 
 CARE_TYPES = {
     "All Healthcare": ["hospital", "pharmacy", "doctor", "dentist", "veterinary_care", "physiotherapist"],
@@ -158,60 +157,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
     return pd.DataFrame(facilities)
 
-def check_wheelchair_accessibility(lat, lon, geoapify_api_key):
-    """
-    Check wheelchair accessibility for a specific location using Geoapify API.
-
-    Args:
-        lat (float): Latitude of the location.
-        lon (float): Longitude of the location.
-        geoapify_api_key (str): Geoapify API key.
-
-    Returns:
-        str: Wheelchair accessibility status ('yes', 'no', 'limited', or 'unknown').
-    """
-    url = "https://api.geoapify.com/v2/places"
-    params = {
-        "filter": f"point:{lon},{lat}",
-        "conditions": "wheelchair",
-        "limit": 1,
-        "apiKey": geoapify_api_key,
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        if data.get("features"):
-            return data["features"][0]["properties"].get("wheelchair", "unknown")
-    return "unknown"
-
-def enrich_with_wheelchair_data(facilities, geoapify_api_key):
-    """
-    Enrich facilities data with wheelchair accessibility information.
-
-    Args:
-        facilities (pd.DataFrame): DataFrame of facilities from Google Places.
-        geoapify_api_key (str): Geoapify API key.
-
-    Returns:
-        pd.DataFrame: Enriched DataFrame with wheelchair data.
-    """
-    if facilities.empty:
-        return facilities
-
-    wheelchair_data = []
-    for _, row in facilities.iterrows():
-        wheelchair_status = check_wheelchair_accessibility(
-            lat=row["latitude"],
-            lon=row["longitude"],
-            geoapify_api_key=geoapify_api_key
-        )
-        wheelchair_data.append(wheelchair_status)
-
-    facilities["wheelchair"] = wheelchair_data
-    return facilities
-
-
-
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
     params = {"address": query, "key": GOOGLE_API_KEY}
@@ -283,10 +228,6 @@ elif location_query:
 # Ensure facilities are stored in session state
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
-    st.write("Enriched Data:", facilities.head())
-    st.write(f"Number of wheelchair-accessible facilities: {sum(facilities['wheelchair'] == 'yes')}")
-
-wheelchair_filter = st.checkbox("Show only wheelchair-accessible places", value=False)
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
@@ -298,12 +239,7 @@ if st.button("Search", key="search_button"):
         care_type=CARE_TYPES.get(care_type, "hospital"),
         open_only=open_only
     )
-    facilities = enrich_with_wheelchair_data(facilities, GEOAPIFY_API_KEY)
-    st.write(f"Facilities enriched with wheelchair data: {len(facilities)}")
-    st.write(facilities.head())  # Display a sample of the data
-
-    if wheelchair_filter:
-        facilities = facilities[facilities["wheelchair"] == "yes"]
+    
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
