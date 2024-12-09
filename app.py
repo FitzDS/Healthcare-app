@@ -10,18 +10,19 @@ from openai import Client
 client = Client(api_key=st.secrets["api_keys"]["openai"])
 
 # Load API keys from Streamlit secrets
-GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
 
 CARE_TYPES = {
-    "All Healthcare": "healthcare",
-    "Pharmacy": "healthcare.pharmacy",
-    "Hospital": "healthcare.hospital",
-    "Clinic": "healthcare.clinic",
-    "Dentist": "healthcare.dentist",
-    "Rehabilitation": "healthcare.rehabilitation",
-    "Emergency": "healthcare.emergency",
-    "Veterinary": "healthcare.veterinary",
+    "All Healthcare": "health",
+    "Pharmacy": "pharmacy",
+    "Hospital": "hospital",
+    "Doctor": "doctor",
+    "Dentist": "dentist",
+    "Rehabilitation": "physiotherapist",
+    "Emergency": "hospital",
+    "Veterinary": "veterinary_care",
+    "Diagnostic Center": "diagnostic_center",
+    "Chiropractor": "chiropractor",
 }
 
 LANGUAGES = {"English": "en", "Spanish": "es"}
@@ -198,11 +199,11 @@ elif location_query:
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data_google(
-        latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only
+        latitude, longitude, radius, CARE_TYPES.get(care_type, "health"), open_only=open_only
     )
 
     if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
+        st.error("No facilities found.        st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(f"Found {len(facilities)} facilities.")
@@ -258,3 +259,4 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
