@@ -97,8 +97,7 @@ wheelchair_filter = st.checkbox("Show only wheelchair-accessible facilities")
 
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
-    Fetch healthcare data using Google Places API with support for multiple healthcare categories.
-    Includes wheelchair accessibility filtering.
+    Fetch healthcare data using Google Places API with wheelchair accessibility logic.
 
     Args:
         latitude (float): Latitude of the search center.
@@ -135,8 +134,14 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
-                    # Add wheelchair accessibility field
-                    wheelchair_accessible = result.get("accessibility", {}).get("wheelchair_accessible_entrance", False)
+                    # Extract accessibility options
+                    accessibility = result.get("accessibility", {})
+                    wheelchair_accessible = all([
+                        accessibility.get("wheelchairAccessibleEntrance", None) is True,
+                        accessibility.get("wheelchairAccessibleParking", None) is True,
+                        accessibility.get("wheelchairAccessibleRestroom", None) is True,
+                        accessibility.get("wheelchairAccessibleSeating", None) is True,
+                    ])
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
@@ -162,6 +167,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
