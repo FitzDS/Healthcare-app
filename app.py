@@ -255,68 +255,56 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
-
 if st.button("Search"):
     st.write("Fetching data...")
-    st.session_state["facilities"] = fetch_healthcare_data(
-        latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only
-    )
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
-facilities = st.session_state["facilities"]
-
-if facilities.empty:
-    st.error(TRANSLATIONS[language_code]["no_facilities"])
-    st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
-else:
-    # Sidebar for Facility Details
-    st.sidebar.title(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
-    for _, row in facilities.iterrows():
-        st.sidebar.markdown(f"### {row['name']}")
-        st.sidebar.markdown(f"- {TRANSLATIONS[language_code]['search_location']}: {row['address']}")
-        st.sidebar.markdown(f"- {TRANSLATIONS[language_code]['rating']}: {row['rating']} ({row['user_ratings_total']} {TRANSLATIONS[language_code]['reviews']})")
-        st.sidebar.markdown(f"[{TRANSLATIONS[language_code]['get_directions']}](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})")
-
-    st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
-    m = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(m)
-
-    for _, row in facilities.iterrows():
-        color = "gray"  # Default color for unrated
-        if row["rating"] != "No rating" and row["rating"]:
-            if float(row["rating"]) >= 4:
-                color = "green"
-            elif float(row["rating"]) >= 3:
-                color = "blue"
-            elif float(row["rating"]) >= 2:
-                color = "orange"
-            elif float(row["rating"]) >= 1:
-                color = "yellow"
-
-        popup_content = f"""
-            <b>{row['name']}</b><br>
-            {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
-            {TRANSLATIONS[language_code]['open_only'] if row['open_now'] else TRANSLATIONS[language_code]['closed']}<br>
-            {TRANSLATIONS[language_code]['rating']}: {row['rating']} ({row['user_ratings_total']} {TRANSLATIONS[language_code]['reviews']})<br>
-            <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">{TRANSLATIONS[language_code]['get_directions']}</a>
-        """
-
-        folium.Marker(
-            location=[row["latitude"], row["longitude"]],
-            popup=popup_content,
-            icon=folium.Icon(color=color)
+    if facilities.empty:
+        st.error(TRANSLATIONS[language_code]["no_facilities"])
+        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
+    else:
+        st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
+        m = folium.Map(location=[latitude, longitude], zoom_start=12)
+        folium.Circle(
+            location=[latitude, longitude],
+            radius=radius,
+            color="blue",
+            fill=True,
+            fill_opacity=0.4
         ).add_to(m)
 
-    st.session_state["map"] = m
+        for _, row in facilities.iterrows():
+            color = "gray"  # Default color for unrated
+            if row["rating"] != "No rating" and row["rating"]:
+                if float(row["rating"]) >= 4:
+                    color = "green"
+                elif float(row["rating"]) >= 3:
+                    color = "blue"
+                elif float(row["rating"]) >= 2:
+                    color = "orange"
+                elif float(row["rating"]) >= 1:
+                    color = "yellow"
+        
+            # Directly access translations
+            popup_content = f"""
+                <b>{row['name']}</b><br>
+                {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
+                {TRANSLATIONS[language_code]['open_only'] if row['open_now'] else TRANSLATIONS[language_code]['closed']}<br>
+                {TRANSLATIONS[language_code]['rating']}: {row['rating']} ({row['user_ratings_total']} {TRANSLATIONS[language_code]['reviews']})<br>
+                <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">{TRANSLATIONS[language_code]['get_directions']}</a>
+            """
+        
+            folium.Marker(
+                location=[row["latitude"], row["longitude"]],
+                popup=popup_content,
+                icon=folium.Icon(color=color)
+            ).add_to(m)
 
-# Render the map (outside conditional logic)
+
+
+
+        st.session_state["map"] = m
+
 if "map" in st.session_state and st.session_state["map"] is not None:
     st_folium(st.session_state["map"], width=700, height=500)
 else:
