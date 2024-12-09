@@ -165,7 +165,7 @@ st.markdown(f"""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=20000, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
+radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=7500, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
