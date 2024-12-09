@@ -116,7 +116,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
         longitude (float): Longitude of the location.
         radius (int): Search radius in meters.
         care_type (str): Category of healthcare (e.g., 'healthcare.hospital').
-        open_only (bool): Whether to include only currently open facilities.
 
     Returns:
         pd.DataFrame: A DataFrame with facility information.
@@ -140,10 +139,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
             if care_type not in properties.get("categories", []):
                 continue
 
-            # Skip facilities that are not open if open_only is True
-            if open_only and not properties.get("opening_hours", {}).get("open_now", False):
-                continue
-
+            # Construct the facility data without opening_hours
             facility = {
                 "name": properties.get("name", "Unknown"),
                 "address": properties.get("formatted", "N/A"),
@@ -151,7 +147,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
                 "longitude": feature["geometry"]["coordinates"][0],
                 "rating": properties.get("rating", "No rating"),
                 "user_ratings_total": properties.get("user_ratings_total", 0),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
 
@@ -159,6 +154,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
     else:
         st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
         return pd.DataFrame()
+
 
 
 
