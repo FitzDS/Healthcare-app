@@ -217,7 +217,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"))
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
