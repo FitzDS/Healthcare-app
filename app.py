@@ -71,39 +71,32 @@ def classify_issue_with_openai(issue_description):
         return "Error"
 
 
-def enhance_facility_data_with_google(facility):
+def enhance_facility_with_google_data(facility):
     """
-    Enhance facility data using Google Places API to fetch reviews and hours of operation.
-    
-    Args:
-        facility (dict): A dictionary with facility details.
-
-    Returns:
-        dict: Enhanced facility data with reviews and hours of operation.
+    Enhance facility details using Google Places API.
     """
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    query = facility.get("name", "Unknown")
     params = {
-        "location": f"{facility['latitude']},{facility['longitude']}",
-        "radius": 100,  # Small radius to find the specific place
-        "keyword": facility['name'],  # Search by name
+        "input": query,
+        "inputtype": "textquery",
+        "fields": "name,formatted_address,rating,user_ratings_total,opening_hours",
         "key": GOOGLE_API_KEY,
     }
-    
-    response = requests.get(url, params=params)
+    response = requests.get("https://maps.googleapis.com/maps/api/place/findplacefromtext/json", params=params)
     if response.status_code == 200:
         data = response.json()
-        if data.get("results"):
-            # Assume the first result is the best match
-            best_match = data["results"][0]
-            facility["rating"] = best_match.get("rating", "No rating")
-            facility["user_ratings_total"] = best_match.get("user_ratings_total", 0)
-            facility["open_now"] = best_match.get("opening_hours", {}).get("open_now", "Unknown")
+        if data.get("candidates"):
+            candidate = data["candidates"][0]
+            facility["address"] = candidate.get("formatted_address", facility.get("address", "N/A"))
+            facility["rating"] = candidate.get("rating", facility.get("rating", "No rating"))
+            facility["user_ratings_total"] = candidate.get("user_ratings_total", facility.get("user_ratings_total", 0))
+            facility["open_now"] = candidate.get("opening_hours", {}).get("open_now", facility.get("open_now", "Unknown"))
         else:
-            st.warning(f"No matching data found for {facility['name']} via Google API.")
+            st.warning(f"No matching data found for {query} via Google API.")
     else:
-        st.error(f"Error fetching data from Google API: {response.status_code}")
-    
+        st.error(f"Google API error: {response.status_code}")
     return facility
+
 
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
