@@ -113,7 +113,7 @@ legend_text = {
     """
 }
     
-    st.markdown(legend_text[language_code], unsafe_allow_html=True)
+st.markdown(legend_text[language_code], unsafe_allow_html=True)
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
