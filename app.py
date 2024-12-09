@@ -65,7 +65,7 @@ def classify_issue_with_openai(issue_description):
             max_tokens=50,
             temperature=0
         )
-        category = response["choices"][0]["message"]["content"].strip()
+        category = response.choices[0].message.content.strip()
         return category
     except Exception as e:
         st.error(f"Error during classification: {e}")
