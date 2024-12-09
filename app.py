@@ -4,13 +4,15 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
-import openai
+from openai import Client
 
 # Load API keys (replace with secure secrets management later)
 GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
 OPENAI_API_KEY = st.secrets["api_keys"]["openai"]
-openai.api_key = OPENAI_API_KEY
+
+# Initialize OpenAI client
+client = Client(api_key=OPENAI_API_KEY)
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
@@ -42,14 +44,16 @@ def classify_issue(issue_description):
     Use OpenAI's API to classify an issue description into one of the CARE_TYPES categories.
     """
     try:
-        response = openai.ChatCompletions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an assistant trained to classify healthcare-related issues into predefined categories: All Healthcare, Pharmacy, Hospital, Clinic, Dentist, Rehabilitation, Emergency, Veterinary."},
                 {"role": "user", "content": f"Issue: {issue_description}\nClassify this issue into one of the categories."}
-            ]
+            ],
+            max_tokens=50,
+            temperature=0
         )
-        classification = response.choices[0].message["content"]
+        classification = response["choices"][0]["message"]["content"]
         return classification.strip()
     except Exception as e:
         st.error(f"Error during classification: {e}")
@@ -273,3 +277,4 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
