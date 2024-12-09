@@ -194,11 +194,7 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
-
-if language_code == "es":
-    st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
-else:
-    st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
+st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
