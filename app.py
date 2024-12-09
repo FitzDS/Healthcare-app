@@ -85,11 +85,11 @@ st.title(t("title"))
 st.markdown(f"""### {t("legend_title")}
 - **{t("legend_red_marker")}**
 - **{t("legend_rating_colors")}**:
-  - {t("legend_colors")[0]}
-  - {t("legend_colors")[1]}
-  - {t("legend_colors")[2]}
-  - {t("legend_colors")[3]}
-  - {t("legend_colors")[4]}
+  - {translations["legend_colors"][language_code][0]}
+  - {translations["legend_colors"][language_code][1]}
+  - {translations["legend_colors"][language_code][2]}
+  - {translations["legend_colors"][language_code][3]}
+  - {translations["legend_colors"][language_code][4]}
 """)
 
 location_query = st.text_input(t("search_by_location"))
