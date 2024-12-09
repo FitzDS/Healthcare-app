@@ -93,9 +93,12 @@ def classify_issue_with_openai_cached(issue_description):
             return "Error"
 
 
+wheelchair_filter = st.checkbox("Show only wheelchair-accessible facilities")
+
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare data using Google Places API with support for multiple healthcare categories.
+    Includes wheelchair accessibility filtering.
 
     Args:
         latitude (float): Latitude of the search center.
@@ -132,6 +135,9 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
+                    # Add wheelchair accessibility field
+                    wheelchair_accessible = result.get("accessibility", {}).get("wheelchair_accessible_entrance", False)
+
                     facilities.append({
                         "name": result.get("name", "Unknown"),
                         "address": result.get("vicinity", "N/A"),
@@ -140,14 +146,14 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
+                        "wheelchair_accessible": wheelchair_accessible,
                     })
 
                 # Check for the next page token
                 next_page_token = data.get("next_page_token")
                 if next_page_token:
-                    # Pause to let the token activate (required by API)
                     import time
-                    time.sleep(2)
+                    time.sleep(2)  # Pause to let the token activate (required by API)
                     params = {"pagetoken": next_page_token, "key": GOOGLE_API_KEY}
                 else:
                     break
@@ -239,12 +245,21 @@ if st.button("Search", key="search_button"):
         care_type=CARE_TYPES.get(care_type, "hospital"),
         open_only=open_only
     )
+
+    # Filter for wheelchair accessibility if the checkbox is checked
+    if wheelchair_filter:
+        facilities = facilities[facilities["wheelchair_accessible"] == True]
     
-    # Store the fetched facilities in session state
+    # Store the facilities in session state
     st.session_state["facilities"] = facilities
 
-# Retrieve facilities from session state
-facilities = st.session_state["facilities"]
+# Display facilities if available
+facilities = st.session_state.get("facilities", pd.DataFrame())
+if not facilities.empty:
+    st.write(f"{len(facilities)} facilities found.")
+    st.dataframe(facilities)
+else:
+    st.warning("No facilities found.")
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
