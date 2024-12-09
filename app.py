@@ -278,8 +278,6 @@ if st.button("Search"):
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
-    else:
-        st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
