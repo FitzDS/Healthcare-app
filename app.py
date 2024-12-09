@@ -243,10 +243,10 @@ if st.button("Search", key="search_button"):
     )
 
     if facilities.empty:
-        st.error(translate("no_facilities_found"))
+        st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
-        st.write(f"{translate('inferred_care_type')} {len(facilities)}")
+        st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
