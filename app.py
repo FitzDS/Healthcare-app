@@ -70,6 +70,42 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
+
+def enhance_facility_data_with_google(facility):
+    """
+    Enhance facility data using Google Places API to fetch reviews and hours of operation.
+    
+    Args:
+        facility (dict): A dictionary with facility details.
+
+    Returns:
+        dict: Enhanced facility data with reviews and hours of operation.
+    """
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    params = {
+        "location": f"{facility['latitude']},{facility['longitude']}",
+        "radius": 100,  # Small radius to find the specific place
+        "keyword": facility['name'],  # Search by name
+        "key": GOOGLE_API_KEY,
+    }
+    
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data.get("results"):
+            # Assume the first result is the best match
+            best_match = data["results"][0]
+            facility["rating"] = best_match.get("rating", "No rating")
+            facility["user_ratings_total"] = best_match.get("user_ratings_total", 0)
+            facility["open_now"] = best_match.get("opening_hours", {}).get("open_now", "Unknown")
+        else:
+            st.warning(f"No matching data found for {facility['name']} via Google API.")
+    else:
+        st.error(f"Error fetching data from Google API: {response.status_code}")
+    
+    return facility
+
+
 def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare facilities using the Geoapify Places API.
@@ -201,28 +237,35 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities.iterrows():
+            # Convert row to dictionary and enhance it
+            facility = row.to_dict()
+            enhanced_facility = enhance_facility_data_with_google(facility)
+            
+            # Determine marker color based on rating
             color = "gray"  # Default color for unrated
-            if row["rating"] != "No rating" and row["rating"]:
-                if float(row["rating"]) >= 4:
+            if enhanced_facility["rating"] != "No rating" and enhanced_facility["rating"]:
+                if float(enhanced_facility["rating"]) >= 4:
                     color = "green"
-                elif float(row["rating"]) >= 3:
+                elif float(enhanced_facility["rating"]) >= 3:
                     color = "blue"
-                elif float(row["rating"]) >= 2:
+                elif float(enhanced_facility["rating"]) >= 2:
                     color = "orange"
-                elif float(row["rating"]) >= 1:
+                elif float(enhanced_facility["rating"]) >= 1:
                     color = "yellow"
-
+            
+            # Add marker to the map
             folium.Marker(
-                location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                location=[enhanced_facility["latitude"], enhanced_facility["longitude"]],
+                popup=f"""
+                    <b>{enhanced_facility['name']}</b><br>
+                    Address: {enhanced_facility['address']}<br>
+                    Open Now: {enhanced_facility['open_now']}<br>
+                    Rating: {enhanced_facility['rating']} ({enhanced_facility['user_ratings_total']} reviews)<br>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank">Get Directions</a>
+                """,
                 icon=folium.Icon(color=color)
             ).add_to(m)
 
-        folium.Marker(
-            location=[latitude, longitude],
-            popup="Current Location",
-            icon=folium.Icon(icon="info-sign", color="red")
-        ).add_to(m)
 
         st.session_state["map"] = m
 
