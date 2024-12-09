@@ -6,10 +6,12 @@ from streamlit_folium import st_folium
 import folium
 import openai
 
+# Load API keys (replace with secure secrets management later)
 GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
 OPENAI_API_KEY = st.secrets["api_keys"]["openai"]
 openai.api_key = OPENAI_API_KEY
+
 CARE_TYPES = {
     "All Healthcare": "healthcare",
     "Pharmacy": "healthcare.pharmacy",
@@ -40,14 +42,14 @@ def classify_issue(issue_description):
     Use OpenAI's API to classify an issue description into one of the CARE_TYPES categories.
     """
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.ChatCompletions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an assistant trained to classify healthcare-related issues into predefined categories: All Healthcare, Pharmacy, Hospital, Clinic, Dentist, Rehabilitation, Emergency, Veterinary."},
                 {"role": "user", "content": f"Issue: {issue_description}\nClassify this issue into one of the categories."}
             ]
         )
-        classification = response["choices"][0]["message"]["content"]
+        classification = response.choices[0].message["content"]
         return classification.strip()
     except Exception as e:
         st.error(f"Error during classification: {e}")
@@ -160,8 +162,6 @@ latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care (Leave blank to auto-detect):", options=["Select Care Type"] + list(CARE_TYPES.keys()))
-show_open_only = st.checkbox("Show Open Facilities Only", value=False)
-
 
 if care_type == "Select Care Type":
     st.caption("Tip: Describe the issue below to automatically determine the care type.")
