@@ -38,6 +38,7 @@ if "facilities" not in st.session_state:
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
 
+
 def classify_issue_with_openai(issue_description):
     """
     Classifies a healthcare issue description using OpenAI's API.
@@ -70,36 +71,34 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-    params = {
-        "location": f"{latitude},{longitude}",
-        "radius": radius,
-        "type": care_type,
-        "key": GOOGLE_API_KEY,
-    }
 
+def fetch_healthcare_data(latitude, longitude, radius, care_type):
+    url = f"https://api.geoapify.com/v2/places"
+    params = {
+        "categories": care_type,
+        "filter": f"circle:{longitude},{latitude},{radius}",
+        "limit": 100,
+        "apiKey": GEOAPIFY_API_KEY,
+    }
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
         facilities = []
-        for result in data.get("results", []):
-            if open_only and not result.get("opening_hours", {}).get("open_now", False):
-                continue  # Skip facilities that are not currently open
+        for feature in data.get("features", []):
+            properties = feature.get("properties", {})
+            geometry = feature.get("geometry", {})
             facility = {
-                "name": result.get("name", "Unknown"),
-                "address": result.get("vicinity", "N/A"),
-                "latitude": result["geometry"]["location"]["lat"],
-                "longitude": result["geometry"]["location"]["lng"],
-                "rating": result.get("rating", "No rating"),
-                "user_ratings_total": result.get("user_ratings_total", 0),
-                "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
+                "name": properties.get("name", "Unknown"),
+                "address": properties.get("formatted", "N/A"),
+                "latitude": geometry.get("coordinates", [])[1],
+                "longitude": geometry.get("coordinates", [])[0],
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
-        st.error(f"Error fetching data from Google Places API: {response.status_code}")
+        st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -113,12 +112,14 @@ def get_lat_lon_from_query(query):
     st.error("Location not found. Please try again.")
     return None, None
 
+
 def get_current_location():
     g = geocoder.ip('me')
     if g.ok:
         return g.latlng
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
+
 
 st.title("Healthcare Facility Locator")
 
@@ -137,7 +138,6 @@ location_query = st.text_input("Search by Location:")
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
-open_only = st.checkbox("Show only open facilities")
 
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
@@ -174,7 +174,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "healthcare"))
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
@@ -191,21 +191,10 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities.iterrows():
-            color = "gray"  # Default color for unrated
-            if row["rating"] != "No rating" and row["rating"]:
-                if float(row["rating"]) >= 4:
-                    color = "green"
-                elif float(row["rating"]) >= 3:
-                    color = "blue"
-                elif float(row["rating"]) >= 2:
-                    color = "orange"
-                elif float(row["rating"]) >= 1:
-                    color = "yellow"
-
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
-                icon=folium.Icon(color=color)
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}",
+                icon=folium.Icon(color="blue")
             ).add_to(m)
 
         folium.Marker(
