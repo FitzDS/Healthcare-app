@@ -253,13 +253,14 @@ if st.button("Search", key="search_button"):
         for _, row in facilities.iterrows():
             # Convert row to dictionary and enhance it
             facility = row.to_dict()
-            for facility in facilities:
-                if not facility.get("name"):
-                    st.error(f"Facility missing name: {facility}")
-                    continue
-                if "latitude" not in facility or "longitude" not in facility:
-                    st.error(f"Facility missing coordinates: {facility}")
-                    continue
+            
+            if not facility.get("name"):
+                st.error(f"Facility missing name: {facility}")
+                continue
+            if "latitude" not in facility or "longitude" not in facility:
+                st.error(f"Facility missing coordinates: {facility}")
+                continue
+            
             enhanced_facility = enhance_facility_data_with_google(facility)
             
             # Determine marker color based on rating
@@ -275,23 +276,17 @@ if st.button("Search", key="search_button"):
                     color = "yellow"
             
             # Add marker to the map
-           for facility in facilities_data:  # facilities_data is the list of fetched facilities
-            # Validate the facility before processing
-            if not isinstance(facility, dict) or not facility.get("name"):
-                st.warning(f"Skipping invalid facility data: {facility}")
-                continue
-        
-            # Proceed with valid facility
             folium.Marker(
-                location=[facility["latitude"], facility["longitude"]],
+                location=[enhanced_facility["latitude"], enhanced_facility["longitude"]],
                 popup=f"""
-                    <b>{facility['name']}</b><br>
-                    Address: {facility['address']}<br>
-                    Rating: {facility['rating']} ({facility['user_ratings_total']} reviews)<br>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={facility['latitude']},{facility['longitude']}" target="_blank">Get Directions</a>
+                    <b>{enhanced_facility['name']}</b><br>
+                    Address: {enhanced_facility['address']}<br>
+                    Rating: {enhanced_facility['rating']} ({enhanced_facility['user_ratings_total']} reviews)<br>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank">Get Directions</a>
                 """,
-                icon=folium.Icon(color="blue"),
+                icon=folium.Icon(color=color),
             ).add_to(m)
+
 
 
         st.session_state["map"] = m
