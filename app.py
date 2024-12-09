@@ -4,7 +4,6 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
-from folium import Popup
 from openai import Client
 
 # Set up OpenAI client
@@ -222,7 +221,13 @@ if st.button("Search"):
                 elif float(row["rating"]) >= 1:
                     color = "yellow"
             
-            popup = Popup(popup_content, max_width=300)
+            popup_content = f"""
+                <b>{row['name']}</b><br>
+                {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
+                Open Now: {row['open_now']}<br>
+                Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
+                <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
+            """
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
