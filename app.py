@@ -71,35 +71,51 @@ def classify_issue_with_openai(issue_description):
         return "Error"
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    """
+    Fetch healthcare facilities using the Geoapify Places API.
+
+    Args:
+        latitude (float): Latitude of the location.
+        longitude (float): Longitude of the location.
+        radius (int): Search radius in meters.
+        care_type (str): Category of healthcare (e.g., 'healthcare.hospital').
+        open_only (bool): Whether to include only currently open facilities.
+
+    Returns:
+        pd.DataFrame: A DataFrame with facility information.
+    """
+    url = f"https://api.geoapify.com/v2/places"
     params = {
-        "location": f"{latitude},{longitude}",
-        "radius": radius,
-        "type": care_type,
-        "key": GOOGLE_API_KEY,
+        "categories": care_type,
+        "filter": f"circle:{longitude},{latitude},{radius}",
+        "limit": 50,
+        "apiKey": GEOAPIFY_API_KEY,
     }
 
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
         facilities = []
-        for result in data.get("results", []):
-            if open_only and not result.get("opening_hours", {}).get("open_now", False):
+        for feature in data.get("features", []):
+            properties = feature["properties"]
+            if open_only and not properties.get("opening_hours", {}).get("open_now", False):
                 continue  # Skip facilities that are not currently open
+            
             facility = {
-                "name": result.get("name", "Unknown"),
-                "address": result.get("vicinity", "N/A"),
-                "latitude": result["geometry"]["location"]["lat"],
-                "longitude": result["geometry"]["location"]["lng"],
-                "rating": result.get("rating", "No rating"),
-                "user_ratings_total": result.get("user_ratings_total", 0),
-                "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
+                "name": properties.get("name", "Unknown"),
+                "address": properties.get("formatted", "N/A"),
+                "latitude": feature["geometry"]["coordinates"][1],
+                "longitude": feature["geometry"]["coordinates"][0],
+                "rating": properties.get("rating", "No rating"),
+                "user_ratings_total": properties.get("user_ratings_total", 0),
+                "open_now": properties.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
-        st.error(f"Error fetching data from Google Places API: {response.status_code}")
+        st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
         return pd.DataFrame()
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
