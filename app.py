@@ -357,3 +357,7 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+st.markdown("""
+[Fill out this Google Form](https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog)
+""")
