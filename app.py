@@ -196,7 +196,7 @@ if st.button("Search"):
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
     if facilities.empty:
-                st.error(TRANSLATIONS[language_code]["no_facilities"])
+        st.error(TRANSLATIONS[language_code]["no_facilities"])
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
