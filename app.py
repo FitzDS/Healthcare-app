@@ -22,10 +22,6 @@ CARE_TYPES = {
     "Physiotherapist": "physiotherapist",
 }
 
-LANGUAGES = {"English": "en", "Spanish": "es"}
-selected_language = st.selectbox("Choose Language / Seleccione el idioma:", options=LANGUAGES.keys())
-language_code = LANGUAGES[selected_language]
-
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
