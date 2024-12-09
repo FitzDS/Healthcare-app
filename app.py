@@ -204,7 +204,7 @@ elif location_query:
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
 if st.button("Search", key="search_button"):
-        st.write("Fetching data...")
+    st.write("Fetching data...")
     facilities = fetch_healthcare_data_google(
         latitude=latitude,
         longitude=longitude,
@@ -270,4 +270,5 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
 
