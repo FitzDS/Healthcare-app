@@ -176,7 +176,7 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
 
-st.title("Healthcare Facility Locator")
+st.title("Global Healthcare Facility Locator")
 
 # Add legend above the map
 st.markdown(f"""### Legend
