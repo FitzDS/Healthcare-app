@@ -180,10 +180,14 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
 
-st.title("Healthcare Facility Locator")
-
-# Add legend above the map
-st.markdown(f"""### Legend
+# Translation dictionary
+TRANSLATIONS = {
+    "title": {
+        "en": "Healthcare Facility Locator",
+        "es": "Buscador de Instalaciones Médicas"
+    },
+    "legend": {
+        "en": """### Legend
 - **Red Marker**: Current Location
 - **Rating Colors**:
   - **Green**: 4-5 Stars
@@ -191,49 +195,107 @@ st.markdown(f"""### Legend
   - **Orange**: 2-3 Stars
   - **Yellow**: 1-2 Stars
   - **Gray**: Unrated or 0-1 Stars
-""")
+""",
+        "es": """### Leyenda
+- **Marcador Rojo**: Ubicación Actual
+- **Colores de Clasificación**:
+  - **Verde**: 4-5 Estrellas
+  - **Azul**: 3-4 Estrellas
+  - **Naranja**: 2-3 Estrellas
+  - **Amarillo**: 1-2 Estrellas
+  - **Gris**: Sin Clasificación o 0-1 Estrellas
+"""
+    },
+    "search_by_location": {
+        "en": "Search by Location:",
+        "es": "Buscar por Ubicación:"
+    },
+    "radius": {
+        "en": "Search Radius (meters):",
+        "es": "Radio de Búsqueda (metros):"
+    },
+    "describe_issue": {
+        "en": "Describe the issue (optional):",
+        "es": "Describa el problema (opcional):"
+    },
+    "type_of_care": {
+        "en": "Type of Care (leave blank to auto-detect):",
+        "es": "Tipo de Atención (deje en blanco para detectar automáticamente):"
+    },
+    "open_only": {
+        "en": "Show only open facilities",
+        "es": "Mostrar solo instalaciones abiertas"
+    },
+    "note_search_location": {
+        "en": "Note: Search by location will take precedence over the 'Use Current Location' button.",
+        "es": "Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'."
+    },
+    "use_current_location": {
+        "en": "Use Current Location",
+        "es": "Usar Ubicación Actual"
+    },
+    "latitude": {
+        "en": "Latitude",
+        "es": "Latitud"
+    },
+    "longitude": {
+        "en": "Longitude",
+        "es": "Longitud"
+    },
+    "search_button": {
+        "en": "Search",
+        "es": "Buscar"
+    },
+    "fetching_data": {
+        "en": "Fetching data...",
+        "es": "Obteniendo datos..."
+    },
+    "no_facilities_found": {
+        "en": "No facilities found. Check your API key, location, or radius.",
+        "es": "No se encontraron instalaciones. Verifique su clave API, ubicación o radio."
+    },
+    "inferred_care_type": {
+        "en": "Inferred Type of Care:",
+        "es": "Tipo de Atención Inferido:"
+    },
+    "classification_warning": {
+        "en": "Could not classify issue; defaulting to All Healthcare.",
+        "es": "No se pudo clasificar el problema; cambiando a Atención Médica General."
+    },
+    "using_location": {
+        "en": "Using location:",
+        "es": "Usando ubicación:"
+    }
+}
 
-location_query = st.text_input("Search by Location:")
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=20000, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
-issue_description = st.text_area("Describe the issue (optional):")
-care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
-open_only = st.checkbox("Show only open facilities")
+# Function to get translated text
+def translate(key):
+    return TRANSLATIONS[key][language_code]
 
-if language_code == "es":
-    st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
-else:
-    st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
+# Updated Streamlit UI with translations
+st.title(translate("title"))
+st.markdown(translate("legend"))
 
-use_current_location = st.button("Use Current Location", key="current_location_button")
-latitude = st.number_input("Latitude", value=38.5449)
-longitude = st.number_input("Longitude", value=-121.7405)
+location_query = st.text_input(translate("search_by_location"))
+radius = st.slider(
+    translate("radius"),
+    min_value=500,
+    max_value=100000,
+    step=1000,
+    value=20000,
+    help=translate("note_search_location")
+)
+issue_description = st.text_area(translate("describe_issue"))
+care_type = st.selectbox(translate("type_of_care"), options=[""] + list(CARE_TYPES.keys()))
+open_only = st.checkbox(translate("open_only"))
 
-# Infer care type if issue description is provided
-if issue_description and not care_type:
-    inferred_care_type = classify_issue_with_openai_cached(issue_description)
-    if inferred_care_type in CARE_TYPES:
-        care_type = inferred_care_type
-        st.success(f"Inferred Type of Care: {care_type}")
-    else:
-        st.warning("Could not classify issue; defaulting to All Healthcare.")
-        care_type = "All Healthcare"
+st.caption(translate("note_search_location"))
+use_current_location = st.button(translate("use_current_location"), key="current_location_button")
+latitude = st.number_input(translate("latitude"), value=38.5449)
+longitude = st.number_input(translate("longitude"), value=-121.7405)
 
-if use_current_location:
-    current_location = get_current_location()
-    latitude = current_location[0]
-    longitude = current_location[1]
-    st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
-    location_query = ""  # Clear the location query to avoid conflicts
-
-elif location_query:
-    lat, lon = get_lat_lon_from_query(location_query)
-    if lat and lon:
-        latitude = lat
-        longitude = lon
-        st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
-
-if st.button("Search", key="search_button"):
-    st.write("Fetching data...")
+if st.button(translate("search_button"), key="search_button"):
+    st.write(translate("fetching_data"))
     facilities = fetch_healthcare_data_google(
         latitude=latitude,
         longitude=longitude,
@@ -243,10 +305,11 @@ if st.button("Search", key="search_button"):
     )
 
     if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
+        st.error(translate("no_facilities_found"))
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
-        st.write(f"Found {len(facilities)} facilities.")
+        st.write(f"{translate('inferred_care_type')} {len(facilities)}")
+
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
