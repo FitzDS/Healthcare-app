@@ -6,11 +6,10 @@ from streamlit_folium import st_folium
 import folium
 import openai
 
-GEOAPIFY_API_KEY = st.secrets["geoapify"]
-GOOGLE_API_KEY = st.secrets["google"]
-OPENAI_API_KEY = st.secrets["openai"]
+GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
+GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
+OPENAI_API_KEY = st.secrets["api_keys"]["openai"]
 openai.api_key = OPENAI_API_KEY
-
 CARE_TYPES = {
     "All Healthcare": "healthcare",
     "Pharmacy": "healthcare.pharmacy",
