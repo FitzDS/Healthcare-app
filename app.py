@@ -234,6 +234,35 @@ if st.button("Search"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
+    # Add legend above the map
+    legend_text = {
+        "en": """
+            ### Legend
+            - **Red Marker**: Current Location
+            - **Rating Colors**:
+              - **Green**: 4-5 Stars
+              - **Blue**: 3-4 Stars
+              - **Orange**: 2-3 Stars
+              - **Yellow**: 1-2 Stars
+              - **Gray**: Unrated or 0-1 Stars
+        """,
+        "es": """
+            ### Leyenda
+            - **Marcador Rojo**: Ubicación Actual
+            - **Colores de Clasificación**:
+              - **Verde**: 4-5 Estrellas
+              - **Azul**: 3-4 Estrellas
+              - **Naranja**: 2-3 Estrellas
+              - **Amarillo**: 1-2 Estrellas
+              - **Gris**: Sin Clasificación o 0-1 Estrellas
+        """
+    }
+    
+    st.markdown(legend_text[language_code], unsafe_allow_html=True)
+
+    
+
+    
     if facilities.empty:
         st.error(TRANSLATIONS[language_code]["no_facilities"])
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
