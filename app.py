@@ -124,29 +124,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
     return pd.DataFrame(facilities)
 
-
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        facilities = []
-        for result in data.get("results", []):
-            if open_only and not result.get("opening_hours", {}).get("open_now", False):
-                continue  # Skip facilities that are not currently open
-            facility = {
-                "name": result.get("name", "Unknown"),
-                "address": result.get("vicinity", "N/A"),
-                "latitude": result["geometry"]["location"]["lat"],
-                "longitude": result["geometry"]["location"]["lng"],
-                "rating": result.get("rating", "No rating"),
-                "user_ratings_total": result.get("user_ratings_total", 0),
-                "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
-            }
-            facilities.append(facility)
-        return pd.DataFrame(facilities)
-    else:
-        st.error(f"Error fetching data from Google Places API: {response.status_code}")
-        return pd.DataFrame()
-
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
     params = {"address": query, "key": GOOGLE_API_KEY}
@@ -220,7 +197,9 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
+    facilities = fetch_healthcare_data_google(
+        latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only
+    )
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
