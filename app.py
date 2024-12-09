@@ -70,7 +70,7 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type):
+def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
     url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     params = {
         "location": f"{latitude},{longitude}",
@@ -84,6 +84,8 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         data = response.json()
         facilities = []
         for result in data.get("results", []):
+            if open_only and not result.get("opening_hours", {}).get("open_now", False):
+                continue  # Skip facilities that are not currently open
             facility = {
                 "name": result.get("name", "Unknown"),
                 "address": result.get("vicinity", "N/A"),
@@ -135,6 +137,7 @@ location_query = st.text_input("Search by Location:")
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
+open_only = st.checkbox("Show only open facilities")
 
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
@@ -171,7 +174,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"))
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
