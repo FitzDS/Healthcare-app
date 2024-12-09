@@ -4,6 +4,7 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
+from folium import Popup
 from openai import Client
 
 # Set up OpenAI client
