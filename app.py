@@ -96,14 +96,15 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
                 "wheelchair": properties.get("wheelchair", "unknown"),
-                "open_now": properties.get("opening_hours", {}).get("open_now", None) if isinstance(properties.get("opening_hours"), dict) else None,
-                "rating": properties.get("rating", None),
+                "open_now": properties.get("opening_hours", {}).get("open_now", "Data unavailable") if isinstance(properties.get("opening_hours"), dict) else "Data unavailable",
+                "rating": properties.get("rating", "No rating")
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
+
 
 
 def get_lat_lon_from_query(query):
