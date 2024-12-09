@@ -275,23 +275,23 @@ if st.button("Search", key="search_button"):
                     color = "yellow"
             
             # Add marker to the map
-           for facility in facilities_data:  # facilities_data is the list of fetched facilities
-                # Validate the facility before processing
-                if not isinstance(facility, dict) or not facility.get("name"):
-                    st.warning(f"Skipping invalid facility data: {facility}")
-                    continue
-            
-                # Proceed with valid facility
-                folium.Marker(
-                    location=[facility["latitude"], facility["longitude"]],
-                    popup=f"""
-                        <b>{facility['name']}</b><br>
-                        Address: {facility['address']}<br>
-                        Rating: {facility['rating']} ({facility['user_ratings_total']} reviews)<br>
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={facility['latitude']},{facility['longitude']}" target="_blank">Get Directions</a>
-                    """,
-                    icon=folium.Icon(color="blue"),
-                ).add_to(m)
+       for facility in facilities_data:  # facilities_data is the list of fetched facilities
+            # Validate the facility before processing
+            if not isinstance(facility, dict) or not facility.get("name"):
+                st.warning(f"Skipping invalid facility data: {facility}")
+                continue
+        
+            # Proceed with valid facility
+            folium.Marker(
+                location=[facility["latitude"], facility["longitude"]],
+                popup=f"""
+                    <b>{facility['name']}</b><br>
+                    Address: {facility['address']}<br>
+                    Rating: {facility['rating']} ({facility['user_ratings_total']} reviews)<br>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={facility['latitude']},{facility['longitude']}" target="_blank">Get Directions</a>
+                """,
+                icon=folium.Icon(color="blue"),
+            ).add_to(m)
 
 
         st.session_state["map"] = m
