@@ -97,13 +97,14 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
                 "longitude": geometry.get("coordinates", [])[0],
                 "wheelchair": properties.get("wheelchair", "unknown"),
                 "open_now": properties.get("opening_hours", {}).get("open_now", "unknown"),
-                "rating": properties.get("rating", None)
+                "rating": properties.get("rating", None),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
