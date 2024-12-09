@@ -257,21 +257,7 @@ elif location_query:
 
 if st.button("Search"):
     st.write("Fetching data...")
-
-    # Infer care type from issue description if care type is not selected
-    if issue_description and not care_type:
-        inferred_care_type = classify_issue_with_openai(issue_description)
-        if inferred_care_type in CARE_TYPES:
-            care_type = inferred_care_type
-            st.success(f"Inferred Type of Care: {care_type}")
-        else:
-            st.warning("Could not classify issue; defaulting to All Healthcare.")
-            care_type = "All Healthcare"
-
-    # Fetch facilities
-    facilities = fetch_healthcare_data(
-        latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only
-    )
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
     if facilities.empty:
         st.error(TRANSLATIONS[language_code]["no_facilities"])
