@@ -68,7 +68,7 @@ def classify_issue_with_openai_cached(issue_description):
                 {"role": "system", "content": "You are a healthcare classification assistant."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=50,
+            max_tokens=200,
             temperature=0
         )
         category = response.choices[0].message.content.strip()
