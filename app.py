@@ -216,11 +216,11 @@ if st.button("Search"):
                     color = "green"
                 elif float(row["rating"]) >= 3:
                     color = "blue"
-                elif float(row["rating"]) >= 2:
+                elif float(row["rating"] >= 2):
                     color = "orange"
-                elif float(row["rating"]) >= 1:
+                elif float(row["rating"] >= 1):
                     color = "yellow"
-            
+        
             popup_content = f"""
                 <b>{row['name']}</b><br>
                 {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
@@ -228,25 +228,12 @@ if st.button("Search"):
                 Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
                 <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
             """
-
+        
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>{TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                popup=popup_content,
                 icon=folium.Icon(color=color)
             ).add_to(m)
-
-
-        folium.Marker(
-            location=[row["latitude"], row["longitude"]],
-            popup=f"""
-                <b>{row['name']}</b><br>
-                {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
-                Open Now: {row['open_now']}<br>
-                Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-                <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank">Get Directions</a>
-            """,
-            icon=folium.Icon(color=color)
-        ).add_to(m)
 
 
         st.session_state["map"] = m
