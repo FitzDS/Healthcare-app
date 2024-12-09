@@ -295,6 +295,9 @@ if st.button("Search", key="search_button"):
         open_only=open_only
     )
     facilities = enrich_with_wheelchair_data(facilities, GEOAPIFY_API_KEY)
+    st.write(f"Facilities enriched with wheelchair data: {len(facilities)}")
+    st.write(facilities.head())  # Display a sample of the data
+
     if wheelchair_filter:
         facilities = facilities[facilities["wheelchair"] == "yes"]
     # Store the fetched facilities in session state
