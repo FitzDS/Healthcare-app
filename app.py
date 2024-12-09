@@ -203,7 +203,7 @@ if st.button("Search", key="search_button"):
     )
 
     if facilities.empty:
-        st.error("No facilities found.        st.error("No facilities found. Check your API key, location, or radius.")
+        st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
         st.write(f"Found {len(facilities)} facilities.")
