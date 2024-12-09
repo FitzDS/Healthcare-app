@@ -83,10 +83,10 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
     }
 
     response = requests.get(url, params=params)
-    st.write(f"Request URL: {response.url}")  # Print the request URL for debugging
+    st.write(f"Request URL: {response.url}")  # Debugging: Print the request URL
     if response.status_code == 200:
         data = response.json()
-        st.write(f"API Response: {data}")  # Print the API response for debugging
+        st.write(f"API Response: {data}")  # Debugging: Print the API response
         facilities = []
         for feature in data.get("features", []):
             properties = feature["properties"]
@@ -107,6 +107,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
     else:
         st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
         return pd.DataFrame()
+
 
 
 
