@@ -106,7 +106,7 @@ def enhance_facility_data_with_google(facility):
     return facility
 
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
+def fetch_healthcare_data(latitude, longitude, radius, care_type):
     """
     Fetch healthcare facilities using the Geoapify Places API.
     """
@@ -126,8 +126,6 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
         facilities = []
         for feature in data.get("features", []):
             properties = feature["properties"]
-            if open_only and not properties.get("opening_hours", {}).get("open_now", False):
-                continue  # Skip facilities that are not currently open
 
             facility = {
                 "name": properties.get("name", "Unknown"),
@@ -136,13 +134,13 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
                 "longitude": feature["geometry"]["coordinates"][0],
                 "rating": properties.get("rating", "No rating"),
                 "user_ratings_total": properties.get("user_ratings_total", 0),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
         return pd.DataFrame()
+
 
 
 
