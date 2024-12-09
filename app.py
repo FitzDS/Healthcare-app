@@ -32,6 +32,25 @@ TRANSLATIONS = {
         "found_facilities": "Found {count} facilities.",
         "no_facilities": "No facilities found. Check your API key, location, or radius.",
         "note": "Note: Search by location will take precedence over the 'Use Current Location' button.",
+        "legend_title": "Legend",
+        "legend_red_marker": "Red Marker: Current Location",
+        "legend_rating_colors": "Rating Colors",
+        "legend_colors": [
+            "Green: 4-5 Stars",
+            "Blue: 3-4 Stars",
+            "Orange: 2-3 Stars",
+            "Yellow: 1-2 Stars",
+            "Gray: Unrated or 0-1 Stars",
+        ],
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "fetching_data": "Fetching data...",
+        "popup_current_location": "Current Location",
+        "rating": "Rating",
+        "reviews": "reviews",
+        "get_directions": "Get Directions",
+        "open_now": "Open Now",
+        "closed": "Closed",
     },
     "es": {
         "title": "Buscador de Instalaciones de Salud",
@@ -45,8 +64,28 @@ TRANSLATIONS = {
         "found_facilities": "Se encontraron {count} instalaciones.",
         "no_facilities": "No se encontraron instalaciones. Verifique su clave API, ubicación o radio.",
         "note": "Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.",
+        "legend_title": "Leyenda",
+        "legend_red_marker": "Marcador Rojo: Ubicación Actual",
+        "legend_rating_colors": "Colores de Calificación",
+        "legend_colors": [
+            "Verde: 4-5 Estrellas",
+            "Azul: 3-4 Estrellas",
+            "Naranja: 2-3 Estrellas",
+            "Amarillo: 1-2 Estrellas",
+            "Gris: Sin calificación o 0-1 Estrellas",
+        ],
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "fetching_data": "Obteniendo datos...",
+        "popup_current_location": "Ubicación Actual",
+        "rating": "Calificación",
+        "reviews": "reseñas",
+        "get_directions": "Obtener Direcciones",
+        "open_now": "Abierto Ahora",
+        "closed": "Cerrado",
     },
 }
+
 
 # Main title
 st.title(TRANSLATIONS[language_code]["title"])
@@ -216,17 +255,18 @@ if st.button("Search"):
                     color = "green"
                 elif float(row["rating"]) >= 3:
                     color = "blue"
-                elif float(row["rating"] >= 2):
+                elif float(row["rating"]) >= 2:
                     color = "orange"
-                elif float(row["rating"] >= 1):
+                elif float(row["rating"]) >= 1:
                     color = "yellow"
         
+            # Directly access translations
             popup_content = f"""
                 <b>{row['name']}</b><br>
-                {t('search_by_location')}: {row['address']}<br>
-                Open Now: {row['open_now']}<br>
-                Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-                <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
+                {TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>
+                {TRANSLATIONS[language_code]['open_only'] if row['open_now'] else TRANSLATIONS[language_code]['closed']}<br>
+                {TRANSLATIONS[language_code]['rating']}: {row['rating']} ({row['user_ratings_total']} {TRANSLATIONS[language_code]['reviews']})<br>
+                <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">{TRANSLATIONS[language_code]['get_directions']}</a>
             """
         
             folium.Marker(
@@ -234,6 +274,7 @@ if st.button("Search"):
                 popup=popup_content,
                 icon=folium.Icon(color=color)
             ).add_to(m)
+
 
 
 
