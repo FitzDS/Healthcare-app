@@ -263,7 +263,7 @@ if st.button("Search"):
         st.error(TRANSLATIONS[language_code]["no_facilities"])
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
-        # Add the sidebar for facility details
+        # Sidebar content - render independently
         st.sidebar.title(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
         for _, row in facilities.iterrows():
             st.sidebar.markdown(f"### {row['name']}")
@@ -271,7 +271,7 @@ if st.button("Search"):
             st.sidebar.markdown(f"- {TRANSLATIONS[language_code]['rating']}: {row['rating']} ({row['user_ratings_total']} {TRANSLATIONS[language_code]['reviews']})")
             st.sidebar.markdown(f"[{TRANSLATIONS[language_code]['get_directions']}](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})")
     
-        # Continue rendering the map
+        # Map rendering
         st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
