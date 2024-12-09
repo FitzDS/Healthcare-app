@@ -275,7 +275,7 @@ if st.button("Search", key="search_button"):
                     color = "yellow"
             
             # Add marker to the map
-       for facility in facilities_data:  # facilities_data is the list of fetched facilities
+           for facility in facilities_data:  # facilities_data is the list of fetched facilities
             # Validate the facility before processing
             if not isinstance(facility, dict) or not facility.get("name"):
                 st.warning(f"Skipping invalid facility data: {facility}")
