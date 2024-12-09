@@ -225,11 +225,13 @@ elif location_query:
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
 # Ensure facilities are stored in session state
+# Ensure facilities are stored in session state
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
+    # Fetch facilities using Google API
     facilities = fetch_healthcare_data_google(
         latitude=latitude,
         longitude=longitude,
@@ -238,83 +240,84 @@ if st.button("Search", key="search_button"):
         open_only=open_only
     )
     
-        # Store the fetched facilities in session state
+    # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
-    
-    # Retrieve facilities from session state
-    facilities = st.session_state["facilities"]
-    
-    # Sidebar with sorted list of locations
-    st.sidebar.title("Nearby Locations")
-    if not facilities.empty:
-        # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
-        facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
-    
-        # Sort facilities by rating (descending)
-        sorted_facilities = facilities.sort_values(by="rating", ascending=False)
-    
-        # Populate sidebar with sorted facilities
-        for _, row in sorted_facilities.iterrows():
-            st.sidebar.markdown(f"""
-            **{row['name']}**
-            - Address: {row['address']}
-            - Rating: {row['rating']} ⭐
-            - Distance: {row.get('distance', 'N/A')} km
-            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
-            """)
-    else:
-        st.sidebar.warning("No facilities found nearby.")
-    
-    if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
-        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
-    else:
-        st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
-        m = folium.Map(location=[latitude, longitude], zoom_start=12)
-        folium.Circle(
-            location=[latitude, longitude],
-            radius=radius,
-            color="blue",
-            fill=True,
-            fill_opacity=0.4
-        ).add_to(m)
-    
-        for _, row in facilities.iterrows():
-            # Assign a color based on ratings
-            color = "gray"  # Default color for unrated
-            if row["rating"] != "No rating" and row["rating"]:
-                if float(row["rating"]) >= 4:
-                    color = "green"
-                elif float(row["rating"]) >= 3:
-                    color = "blue"
-                elif float(row["rating"]) >= 2:
-                    color = "orange"
-                elif float(row["rating"]) >= 1:
-                    color = "yellow"
-    
-            # Generate the directions link
-            directions_link = f"https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}"
-    
-            # Add marker with "Get Directions" link
-            popup_content = f"""
-            <b>{row['name']}</b><br>
-            Address: {row['address']}<br>
-            Open Now: {row['open_now']}<br>
-            Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-            <a href="{directions_link}" target="_blank">Get Directions</a>
-            """
-            folium.Marker(
-                location=[row["latitude"], row["longitude"]],
-                popup=folium.Popup(popup_content, max_width=300),
-                icon=folium.Icon(color=color)
-            ).add_to(m)
-    
-        # Add current location marker
+
+# Retrieve facilities from session state
+facilities = st.session_state["facilities"]
+
+# Sidebar with sorted list of locations
+st.sidebar.title("Nearby Locations")
+if not facilities.empty:
+    # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
+    facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
+
+    # Sort facilities by rating (descending)
+    sorted_facilities = facilities.sort_values(by="rating", ascending=False)
+
+    # Populate sidebar with sorted facilities
+    for _, row in sorted_facilities.iterrows():
+        st.sidebar.markdown(f"""
+        **{row['name']}**
+        - Address: {row['address']}
+        - Rating: {row['rating']} ⭐
+        - Distance: {row.get('distance', 'N/A')} km
+        [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
+        """)
+else:
+    st.sidebar.warning("No facilities found nearby.")
+
+# Check if facilities are empty to display map or error message
+if facilities.empty:
+    st.error("No facilities found. Check your API key, location, or radius.")
+    st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
+else:
+    st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
+    m = folium.Map(location=[latitude, longitude], zoom_start=12)
+    folium.Circle(
+        location=[latitude, longitude],
+        radius=radius,
+        color="blue",
+        fill=True,
+        fill_opacity=0.4
+    ).add_to(m)
+
+    for _, row in facilities.iterrows():
+        # Assign a color based on ratings
+        color = "gray"  # Default color for unrated
+        if row["rating"] != "No rating" and row["rating"]:
+            if float(row["rating"]) >= 4:
+                color = "green"
+            elif float(row["rating"]) >= 3:
+                color = "blue"
+            elif float(row["rating"]) >= 2:
+                color = "orange"
+            elif float(row["rating"]) >= 1:
+                color = "yellow"
+
+        # Generate the directions link
+        directions_link = f"https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}"
+
+        # Add marker with "Get Directions" link
+        popup_content = f"""
+        <b>{row['name']}</b><br>
+        Address: {row['address']}<br>
+        Open Now: {row['open_now']}<br>
+        Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
+        <a href="{directions_link}" target="_blank">Get Directions</a>
+        """
         folium.Marker(
-            location=[latitude, longitude],
-            popup="Current Location",
-            icon=folium.Icon(icon="info-sign", color="red")
+            location=[row["latitude"], row["longitude"]],
+            popup=folium.Popup(popup_content, max_width=300),
+            icon=folium.Icon(color=color)
         ).add_to(m)
+
+    # Add current location marker
+    folium.Marker(
+        location=[latitude, longitude],
+        popup="Current Location",
+        icon=folium.Icon(icon="info-sign", color="red")
+    ).add_to(m)
 
         st.session_state["map"] = m
 
