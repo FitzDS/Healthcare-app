@@ -254,11 +254,11 @@ if st.button("Search", key="search_button"):
             folium.Marker(
                 location=[enhanced_facility["latitude"], enhanced_facility["longitude"]],
                 popup=f"""
-                    <b>{enhanced_facility['name']}</b><br>
-                    Address: {enhanced_facility['address']}<br>
-                    Open Now: {enhanced_facility['open_now']}<br>
-                    Rating: {enhanced_facility['rating']} ({enhanced_facility['user_ratings_total']} reviews)<br>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank">Get Directions</a>
+                    <b>{enhanced_facility.get('name', 'Unknown')}</b><br>
+                    Address: {enhanced_facility.get('address', 'N/A')}<br>
+                    Open Now: {enhanced_facility.get('open_now', 'Unknown')}<br>
+                    Rating: {enhanced_facility.get('rating', 'No rating')} ({enhanced_facility.get('user_ratings_total', '0')} reviews)<br>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank" style="color:blue; text-decoration:underline;">Get Directions</a>
                 """,
                 icon=folium.Icon(color=color)
             ).add_to(m)
