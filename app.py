@@ -73,16 +73,6 @@ def classify_issue_with_openai(issue_description):
 def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare facilities using the Geoapify Places API.
-
-    Args:
-        latitude (float): Latitude of the location.
-        longitude (float): Longitude of the location.
-        radius (int): Search radius in meters.
-        care_type (str): Category of healthcare (e.g., 'healthcare.hospital').
-        open_only (bool): Whether to include only currently open facilities.
-
-    Returns:
-        pd.DataFrame: A DataFrame with facility information.
     """
     url = f"https://api.geoapify.com/v2/places"
     params = {
@@ -93,14 +83,16 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=Fals
     }
 
     response = requests.get(url, params=params)
+    st.write(f"Request URL: {response.url}")  # Debugging: Print the request URL
     if response.status_code == 200:
         data = response.json()
+        st.write(f"API Response: {data}")  # Debugging: Print the API response
         facilities = []
         for feature in data.get("features", []):
             properties = feature["properties"]
             if open_only and not properties.get("opening_hours", {}).get("open_now", False):
                 continue  # Skip facilities that are not currently open
-            
+
             facility = {
                 "name": properties.get("name", "Unknown"),
                 "address": properties.get("formatted", "N/A"),
