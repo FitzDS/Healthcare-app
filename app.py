@@ -93,14 +93,20 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
         "key": GOOGLE_API_KEY,
     }
     facilities = []
-    
+
     while True:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
             for result in data.get("results", []):
+                # Check if the result's types include the care_type
+                result_types = result.get("types", [])
+                if care_type not in result_types:
+                    continue  # Skip non-matching results
+                
                 if open_only and not result.get("opening_hours", {}).get("open_now", False):
                     continue
+
                 facilities.append({
                     "name": result.get("name", "Unknown"),
                     "address": result.get("vicinity", "N/A"),
@@ -124,6 +130,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
             break
 
     return pd.DataFrame(facilities)
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
