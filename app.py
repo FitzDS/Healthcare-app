@@ -70,14 +70,60 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
+    """
+    Fetch healthcare data using Google Places API with support for pagination via next_page_token.
+
+    Args:
+        latitude (float): Latitude of the search center.
+        longitude (float): Longitude of the search center.
+        radius (int): Search radius in meters.
+        care_type (str): Type of healthcare facility to search for.
+        open_only (bool): Whether to include only currently open facilities.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing healthcare facility details.
+    """
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     params = {
         "location": f"{latitude},{longitude}",
         "radius": radius,
         "type": care_type,
         "key": GOOGLE_API_KEY,
     }
+    facilities = []
+    
+    while True:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            for result in data.get("results", []):
+                if open_only and not result.get("opening_hours", {}).get("open_now", False):
+                    continue
+                facilities.append({
+                    "name": result.get("name", "Unknown"),
+                    "address": result.get("vicinity", "N/A"),
+                    "latitude": result["geometry"]["location"]["lat"],
+                    "longitude": result["geometry"]["location"]["lng"],
+                    "rating": result.get("rating", "No rating"),
+                    "user_ratings_total": result.get("user_ratings_total", 0),
+                    "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
+                })
+            # Check for the next page token
+            next_page_token = data.get("next_page_token")
+            if next_page_token:
+                # Pause to let the token activate (required by API)
+                import time
+                time.sleep(2)
+                params = {"pagetoken": next_page_token, "key": GOOGLE_API_KEY}
+            else:
+                break
+        else:
+            st.error(f"Error fetching data from Google Places API: {response.status_code}")
+            break
+
+    return pd.DataFrame(facilities)
+
 
     response = requests.get(url, params=params)
     if response.status_code == 200:
