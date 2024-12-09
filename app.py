@@ -4,10 +4,12 @@ import requests
 import geocoder
 from streamlit_folium import st_folium
 import folium
+import openai
 
-# Load API keys (replace with secure secrets management later)
-GEOAPIFY_API_KEY = "f01884465c8743a9a1d805d1c778e7af"
-GOOGLE_API_KEY = "AIzaSyBIghdeoXzo-XYY1mJkeIezTDPhr6WAHgM"
+GEOAPIFY_API_KEY = st.secrets["geoapify"]
+GOOGLE_API_KEY = st.secrets["google"]
+OPENAI_API_KEY = st.secrets["openai"]
+openai.api_key = OPENAI_API_KEY
 
 CARE_TYPES = {
     "All Healthcare": "healthcare",
@@ -33,6 +35,24 @@ if "facilities" not in st.session_state:
 # Ensure the current location marker is persistent
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
+
+def classify_issue(issue_description):
+    """
+    Use OpenAI's API to classify an issue description into one of the CARE_TYPES categories.
+    """
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an assistant trained to classify healthcare-related issues into predefined categories: All Healthcare, Pharmacy, Hospital, Clinic, Dentist, Rehabilitation, Emergency, Veterinary."},
+                {"role": "user", "content": f"Issue: {issue_description}\nClassify this issue into one of the categories."}
+            ]
+        )
+        classification = response["choices"][0]["message"]["content"]
+        return classification.strip()
+    except Exception as e:
+        st.error(f"Error during classification: {e}")
+        return "All Healthcare"
 
 def fetch_healthcare_data(latitude, longitude, radius, care_type):
     url = f"https://api.geoapify.com/v2/places"
@@ -135,12 +155,24 @@ if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
 else:
     st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
+
 use_current_location = st.button("Use Current Location", key="current_location_button")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
-care_type = st.selectbox("Type of Care:", options=list(CARE_TYPES.keys()))
-show_open_only = st.checkbox("Show Open Facilities Only", value=False)
+care_type = st.selectbox("Type of Care (Leave blank to auto-detect):", options=["Select Care Type"] + list(CARE_TYPES.keys()))
+
+if care_type == "Select Care Type":
+    st.caption("Tip: Describe the issue below to automatically determine the care type.")
+
+issue_description = st.text_area("Describe the issue (optional):")
+if issue_description:
+    inferred_care_type = classify_issue(issue_description)
+    if care_type == "Select Care Type":
+        care_type = inferred_care_type
+        st.write(f"Inferred Type of Care: {inferred_care_type}")
+    else:
+        st.warning("Manual selection of care type takes precedence over automatic detection.")
 
 if use_current_location:
     current_location = get_current_location()
@@ -158,7 +190,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES[care_type])
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "healthcare"))
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
