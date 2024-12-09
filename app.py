@@ -44,7 +44,7 @@ def classify_issue(issue_description):
     Use OpenAI's API to classify an issue description into one of the CARE_TYPES categories.
     """
     try:
-        response = client.chat.completions.create(
+        response = client.chat_completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an assistant trained to classify healthcare-related issues into predefined categories: All Healthcare, Pharmacy, Hospital, Clinic, Dentist, Rehabilitation, Emergency, Veterinary."},
@@ -260,14 +260,13 @@ if st.button("Search", key="search_button"):
 
 # Display the map only when it exists in session state
 if "map" in st.session_state and st.session_state["map"] is not None:
-    # Ensure the current location marker persists
     st_folium(st.session_state["map"], width=700, height=500)
 else:
     default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
     folium.Marker(
         location=[latitude, longitude],
         popup="Current Location",
-        icon=folium.Icon(icon="info-sign", color="red")
+        icon=folium.Icon(icon="info-sign",color="red")
     ).add_to(default_map)
     folium.Circle(
         location=[latitude, longitude],
@@ -277,4 +276,3 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
