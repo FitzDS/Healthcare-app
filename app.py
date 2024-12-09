@@ -284,6 +284,8 @@ elif location_query:
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
+wheelchair_filter = st.checkbox("Show only wheelchair-accessible places", value=False)
+
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     # Fetch facilities using Google API
