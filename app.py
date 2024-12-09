@@ -359,5 +359,10 @@ else:
     st_folium(default_map, width=700, height=500)
 
 st.markdown("""
-[Fill out this Google Form](https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog)
-""")
+<div style="text-align: center;">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog" target="_blank" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+        📝 Fill Out Feedback Form
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
