@@ -38,7 +38,6 @@ if "facilities" not in st.session_state:
 if "current_location_marker" not in st.session_state:
     st.session_state["current_location_marker"] = None
 
-
 def classify_issue_with_openai(issue_description):
     """
     Classifies a healthcare issue description using OpenAI's API.
@@ -71,8 +70,7 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-
-def fetch_healthcare_data(latitude, longitude, radius, care_type):
+def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=None, open_now=None):
     url = f"https://api.geoapify.com/v2/places"
     params = {
         "categories": care_type,
@@ -80,6 +78,11 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         "limit": 100,
         "apiKey": GEOAPIFY_API_KEY,
     }
+    if wheelchair:
+        params["wheelchair"] = wheelchair
+    if open_now:
+        params["conditions"] = "open_now"
+
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
@@ -92,13 +95,14 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "address": properties.get("formatted", "N/A"),
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
+                "wheelchair": properties.get("wheelchair", "unknown"),
+                "open_now": properties.get("open_now", "unknown"),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -112,14 +116,12 @@ def get_lat_lon_from_query(query):
     st.error("Location not found. Please try again.")
     return None, None
 
-
 def get_current_location():
     g = geocoder.ip('me')
     if g.ok:
         return g.latlng
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
-
 
 st.title("Healthcare Facility Locator")
 
@@ -138,6 +140,10 @@ location_query = st.text_input("Search by Location:")
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
+
+# New filters
+wheelchair_filter = st.selectbox("Wheelchair Accessibility:", options=["Any", "Yes", "No", "Limited", "Unknown"])
+open_now_filter = st.checkbox("Only show places that are currently open")
 
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
@@ -174,7 +180,9 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "healthcare"))
+    wheelchair = None if wheelchair_filter == "Any" else wheelchair_filter.lower()
+    open_now = "true" if open_now_filter else None
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "healthcare"), wheelchair, open_now)
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
@@ -193,7 +201,7 @@ if st.button("Search", key="search_button"):
         for _, row in facilities.iterrows():
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}",
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Wheelchair: {row['wheelchair']}<br>Open Now: {row['open_now']}",
                 icon=folium.Icon(color="blue")
             ).add_to(m)
 
