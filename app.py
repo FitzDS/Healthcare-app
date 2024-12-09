@@ -221,16 +221,17 @@ longitude = st.number_input("Longitude", value=-121.7405)
 
 # Infer care type if issue description is provided
 if location_query:
-    from geopy.geocoders import Nominatim
-    geolocator = Nominatim(user_agent="geoapi")
-    location = geolocator.geocode(location_query)
-    if location:
-        latitude, longitude = location.latitude, location.longitude
+    g = geocoder.osm(location_query)
+    if g.ok:
+        latitude, longitude = g.latlng
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
+    else:
+        st.error("Location not found. Please try again.")
 elif use_current_location:
     current_location = get_current_location()
     latitude, longitude = current_location
     st.write(f"Using current location: Latitude {latitude}, Longitude {longitude}")
+
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
