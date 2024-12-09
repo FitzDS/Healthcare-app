@@ -96,16 +96,15 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
                 "wheelchair": properties.get("wheelchair", "unknown"),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "Data unavailable") if isinstance(properties.get("opening_hours"), dict) else "Data unavailable",
-                "rating": properties.get("rating", "No rating")
+                "open_now": properties.get("opening_hours", {}).get("open_now", "unknown"),
+                "rating": properties.get("rating", "N/A"),
+                "user_ratings_total": properties.get("user_ratings_total", 0),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify: {response.status_code}")
         return pd.DataFrame()
-
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -203,19 +202,19 @@ if st.button("Search", key="search_button"):
 
         for _, row in facilities.iterrows():
             color = "gray"  # Default color for unrated
-            if row["rating"]:
-                if row["rating"] >= 4:
+            if row["rating"] != "N/A" and row["rating"]:
+                if float(row["rating"]) >= 4:
                     color = "green"
-                elif row["rating"] >= 3:
+                elif float(row["rating"]) >= 3:
                     color = "blue"
-                elif row["rating"] >= 2:
+                elif float(row["rating"]) >= 2:
                     color = "orange"
-                elif row["rating"] >= 1:
+                elif float(row["rating"]) >= 1:
                     color = "yellow"
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Wheelchair: {row['wheelchair']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']}",
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Wheelchair: {row['wheelchair']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
                 icon=folium.Icon(color=color)
             ).add_to(m)
 
