@@ -13,17 +13,12 @@ client = Client(api_key=st.secrets["api_keys"]["openai"])
 GEOAPIFY_API_KEY = st.secrets["api_keys"]["geoapify"]
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
 
-CARE_TYPES = {
-    "All Healthcare": "healthcare",
-    "Pharmacy": "healthcare.pharmacy",
-    "Hospital": "healthcare.hospital",
-    "Clinic": "healthcare.clinic",
-    "Dentist": "healthcare.dentist",
-    "Rehabilitation": "healthcare.rehabilitation",
-    "Emergency": "healthcare.emergency",
-    "Veterinary": "healthcare.veterinary",
-}
+# Language selection
+LANGUAGES = {"English": "en", "Spanish": "es"}
+selected_language = st.selectbox("Choose Language / Seleccione el idioma:", options=LANGUAGES.keys())
+language_code = LANGUAGES[selected_language]
 
+# Translations for UI text
 TRANSLATIONS = {
     "en": {
         "title": "Healthcare Facility Locator",
@@ -53,15 +48,37 @@ TRANSLATIONS = {
     },
 }
 
+# Main title
 st.title(TRANSLATIONS[language_code]["title"])
-st.selectbox(TRANSLATIONS[language_code]["choose_language"], options=LANGUAGES.keys())
+
+CARE_TYPES = {
+    "All Healthcare": "healthcare",
+    "Pharmacy": "healthcare.pharmacy",
+    "Hospital": "healthcare.hospital",
+    "Clinic": "healthcare.clinic",
+    "Dentist": "healthcare.dentist",
+    "Rehabilitation": "healthcare.rehabilitation",
+    "Emergency": "healthcare.emergency",
+    "Veterinary": "healthcare.veterinary",
+}
+
+# User inputs
 location_query = st.text_input(TRANSLATIONS[language_code]["search_location"])
-radius = st.slider(TRANSLATIONS[language_code]["search_radius"], ...)
+radius = st.slider(
+    TRANSLATIONS[language_code]["search_radius"],
+    min_value=500,
+    max_value=200000,
+    step=1000,
+    value=20000,
+)
+issue_description = st.text_area(TRANSLATIONS[language_code]["describe_issue"])
+care_type = st.selectbox(
+    TRANSLATIONS[language_code]["care_type"],
+    options=[""] + list(CARE_TYPES.keys()),
+)
+open_only = st.checkbox(TRANSLATIONS[language_code]["open_only"])
 
-
-LANGUAGES = {"English": "en", "Spanish": "es"}
-selected_language = st.selectbox("Choose Language / Seleccione el idioma:", options=LANGUAGES.keys())
-language_code = LANGUAGES[selected_language]
+st.caption(TRANSLATIONS[language_code]["note"])
 
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
@@ -94,10 +111,10 @@ def classify_issue_with_openai(issue_description):
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a healthcare classification assistant."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             max_tokens=50,
-            temperature=0
+            temperature=0,
         )
         category = response.choices[0].message.content.strip()
         return category
@@ -155,43 +172,10 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
 
-st.title("Healthcare Facility Locator")
-
-# Add legend above the map
-st.markdown(f"""### Legend
-- **Red Marker**: Current Location
-- **Rating Colors**:
-  - **Green**: 4-5 Stars
-  - **Blue**: 3-4 Stars
-  - **Orange**: 2-3 Stars
-  - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
-""")
-
-location_query = st.text_input("Search by Location:")
-radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
-issue_description = st.text_area("Describe the issue (optional):")
-care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
-open_only = st.checkbox("Show only open facilities")
-
-if language_code == "es":
-    st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
-else:
-    st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
-
-use_current_location = st.button("Use Current Location", key="current_location_button")
+# Use location input or current location
+use_current_location = st.button(TRANSLATIONS[language_code]["use_current_location"])
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
-
-# Infer care type if issue description is provided
-if issue_description and not care_type:
-    inferred_care_type = classify_issue_with_openai(issue_description)
-    if inferred_care_type in CARE_TYPES:
-        care_type = inferred_care_type
-        st.success(f"Inferred Type of Care: {care_type}")
-    else:
-        st.warning("Could not classify issue; defaulting to All Healthcare.")
-        care_type = "All Healthcare"
 
 if use_current_location:
     current_location = get_current_location()
@@ -207,15 +191,15 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-if st.button("Search", key="search_button"):
+if st.button("Search"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
     if facilities.empty:
-        st.error("No facilities found. Check your API key, location, or radius.")
+                st.error(TRANSLATIONS[language_code]["no_facilities"])
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
     else:
-        st.write(f"Found {len(facilities)} facilities.")
+        st.write(TRANSLATIONS[language_code]["found_facilities"].format(count=len(facilities)))
         m = folium.Map(location=[latitude, longitude], zoom_start=12)
         folium.Circle(
             location=[latitude, longitude],
@@ -239,7 +223,7 @@ if st.button("Search", key="search_button"):
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                popup=f"<b>{row['name']}</b><br>{TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
                 icon=folium.Icon(color=color)
             ).add_to(m)
 
@@ -268,3 +252,5 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+    
