@@ -160,6 +160,8 @@ latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, step=1000, value=20000)
 care_type = st.selectbox("Type of Care (Leave blank to auto-detect):", options=["Select Care Type"] + list(CARE_TYPES.keys()))
+show_open_only = st.checkbox("Show Open Facilities Only", value=False)
+
 
 if care_type == "Select Care Type":
     st.caption("Tip: Describe the issue below to automatically determine the care type.")
