@@ -224,6 +224,10 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
+# Ensure facilities are stored in session state
+if "facilities" not in st.session_state:
+    st.session_state["facilities"] = pd.DataFrame()
+
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
     facilities = fetch_healthcare_data_google(
@@ -233,7 +237,13 @@ if st.button("Search", key="search_button"):
         care_type=CARE_TYPES.get(care_type, "hospital"),
         open_only=open_only
     )
-
+    
+        # Store the fetched facilities in session state
+        st.session_state["facilities"] = facilities
+    
+    # Retrieve facilities from session state
+    facilities = st.session_state["facilities"]
+    
     # Sidebar with sorted list of locations
     st.sidebar.title("Nearby Locations")
     if not facilities.empty:
@@ -250,11 +260,11 @@ if st.button("Search", key="search_button"):
             - Address: {row['address']}
             - Rating: {row['rating']} ⭐
             - Distance: {row.get('distance', 'N/A')} km
-            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})  
+            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
             """)
     else:
         st.sidebar.warning("No facilities found nearby.")
-
+    
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
