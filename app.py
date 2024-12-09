@@ -70,96 +70,36 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-
-def enhance_facility_data_with_google(facility):
-    """
-    Enhance facility details using Google Places API.
-    """
-    query = facility.get("name", "Unknown")
-    params = {
-        "input": query,
-        "inputtype": "textquery",
-        "fields": "name,formatted_address,rating,user_ratings_total,opening_hours",
-        "key": GOOGLE_API_KEY,
-    }
-    response = requests.get("https://maps.googleapis.com/maps/api/place/findplacefromtext/json", params=params)
-
-    # Check for successful API response
-    if response.status_code == 200:
-        data = response.json()
-
-        # Handle cases where no candidates are found
-        if not data.get("candidates"):
-            st.warning(f"No matching data found for {query}")
-            return facility  # Return the original facility data
-
-        # Enhance facility with first matching candidate's data
-        candidate = data["candidates"][0]
-        facility["address"] = candidate.get("formatted_address", facility.get("address", "N/A"))
-        facility["rating"] = candidate.get("rating", facility.get("rating", "No rating"))
-        facility["user_ratings_total"] = candidate.get("user_ratings_total", facility.get("user_ratings_total", 0))
-        facility["open_now"] = candidate.get("opening_hours", {}).get("open_now", facility.get("open_now", "Unknown"))
-    else:
-        st.error(f"Google API error: {response.status_code}")
-    
-    return facility
-
-
-
-
 def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
-    """
-    Fetch healthcare facilities using the Geoapify Places API.
-
-    Args:
-        latitude (float): Latitude of the location.
-        longitude (float): Longitude of the location.
-        radius (int): Search radius in meters.
-        care_type (str): Category of healthcare (e.g., 'healthcare.hospital').
-
-    Returns:
-        pd.DataFrame: A DataFrame with facility information.
-    """
-    url = f"https://api.geoapify.com/v2/places"
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     params = {
-        "categories": care_type,
-        "filter": f"circle:{longitude},{latitude},{radius}",
-        "limit": 50,
-        "apiKey": GEOAPIFY_API_KEY,
+        "location": f"{latitude},{longitude}",
+        "radius": radius,
+        "type": care_type,
+        "key": GOOGLE_API_KEY,
     }
 
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
         facilities = []
-        for feature in data.get("features", []):
-            properties = feature["properties"]
-
-            # Ensure the facility matches the requested care type
-            if care_type not in properties.get("categories", []):
-                continue
-
-            # Construct the facility data without opening_hours
+        for result in data.get("results", []):
+            if open_only and not result.get("opening_hours", {}).get("open_now", False):
+                continue  # Skip facilities that are not currently open
             facility = {
-                "name": properties.get("name", "Unknown"),
-                "address": properties.get("formatted", "N/A"),
-                "latitude": feature["geometry"]["coordinates"][1],
-                "longitude": feature["geometry"]["coordinates"][0],
-                "rating": properties.get("rating", "No rating"),
-                "user_ratings_total": properties.get("user_ratings_total", 0),
+                "name": result.get("name", "Unknown"),
+                "address": result.get("vicinity", "N/A"),
+                "latitude": result["geometry"]["location"]["lat"],
+                "longitude": result["geometry"]["location"]["lng"],
+                "rating": result.get("rating", "No rating"),
+                "user_ratings_total": result.get("user_ratings_total", 0),
+                "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
-
         return pd.DataFrame(facilities)
     else:
-        st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
+        st.error(f"Error fetching data from Google Places API: {response.status_code}")
         return pd.DataFrame()
-
-
-
-
-
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -234,7 +174,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"))
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"), open_only=open_only)
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
@@ -251,43 +191,28 @@ if st.button("Search", key="search_button"):
         ).add_to(m)
 
         for _, row in facilities.iterrows():
-            # Convert row to dictionary and enhance it
-            facility = row.to_dict()
-            
-            if not facility.get("name"):
-                st.error(f"Facility missing name: {facility}")
-                continue
-            if "latitude" not in facility or "longitude" not in facility:
-                st.error(f"Facility missing coordinates: {facility}")
-                continue
-            
-            enhanced_facility = enhance_facility_data_with_google(facility)
-            
-            # Determine marker color based on rating
             color = "gray"  # Default color for unrated
-            if enhanced_facility["rating"] != "No rating" and enhanced_facility["rating"]:
-                if float(enhanced_facility["rating"]) >= 4:
+            if row["rating"] != "No rating" and row["rating"]:
+                if float(row["rating"]) >= 4:
                     color = "green"
-                elif float(enhanced_facility["rating"]) >= 3:
+                elif float(row["rating"]) >= 3:
                     color = "blue"
-                elif float(enhanced_facility["rating"]) >= 2:
+                elif float(row["rating"]) >= 2:
                     color = "orange"
-                elif float(enhanced_facility["rating"]) >= 1:
+                elif float(row["rating"]) >= 1:
                     color = "yellow"
-            
-            # Add marker to the map
+
             folium.Marker(
-                location=[enhanced_facility["latitude"], enhanced_facility["longitude"]],
-                popup=f"""
-                    <b>{enhanced_facility['name']}</b><br>
-                    Address: {enhanced_facility['address']}<br>
-                    Rating: {enhanced_facility['rating']} ({enhanced_facility['user_ratings_total']} reviews)<br>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={enhanced_facility['latitude']},{enhanced_facility['longitude']}" target="_blank">Get Directions</a>
-                """,
-                icon=folium.Icon(color=color),
+                location=[row["latitude"], row["longitude"]],
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                icon=folium.Icon(color=color)
             ).add_to(m)
 
-
+        folium.Marker(
+            location=[latitude, longitude],
+            popup="Current Location",
+            icon=folium.Icon(icon="info-sign", color="red")
+        ).add_to(m)
 
         st.session_state["map"] = m
 
