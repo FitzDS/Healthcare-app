@@ -234,6 +234,23 @@ if st.button("Search", key="search_button"):
         open_only=open_only
     )
 
+    # Sidebar with sorted list of locations
+    st.sidebar.title("Nearby Locations")
+    if not facilities.empty:
+        # Sort facilities by distance or rating (modify based on available data)
+        sorted_facilities = facilities.sort_values(by="rating", ascending=False)
+    
+        for _, row in sorted_facilities.iterrows():
+            st.sidebar.markdown(f"""
+            **{row['name']}**
+            - Address: {row['address']}
+            - Rating: {row['rating']} ⭐
+            - Distance: {row.get('distance', 'N/A')} km
+            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})  
+            """)
+    else:
+        st.sidebar.warning("No facilities found nearby.")
+
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
         st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
