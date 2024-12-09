@@ -60,9 +60,14 @@ def classify_issue_with_openai_cached(issue_description):
 
     Issue: {issue_description}
     Category:"""
+
+    primary_model = "gpt-4o-mini"
+    fallback_model = "gpt-3.5-turbo"
+
     try:
+        # Attempt classification with the primary model
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=primary_model,
             messages=[
                 {"role": "system", "content": "You are a healthcare classification assistant."},
                 {"role": "user", "content": prompt}
@@ -73,8 +78,24 @@ def classify_issue_with_openai_cached(issue_description):
         category = response.choices[0].message.content.strip()
         return category
     except Exception as e:
-        st.error(f"Error during classification: {e}")
-        return "Error"
+        print(f"Error with {primary_model}: {e}. Trying fallback model {fallback_model}.")
+        try:
+            # Attempt classification with the fallback model
+            response = client.chat.completions.create(
+                model=fallback_model,
+                messages=[
+                    {"role": "system", "content": "You are a healthcare classification assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=50,
+                temperature=0
+            )
+            category = response.choices[0].message.content.strip()
+            return category
+        except Exception as fallback_error:
+            print(f"Error with fallback model {fallback_model}: {fallback_error}.")
+            return "Error"
+
 
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
