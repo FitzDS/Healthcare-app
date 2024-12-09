@@ -70,42 +70,34 @@ def classify_issue_with_openai(issue_description):
         st.error(f"Error during classification: {e}")
         return "Error"
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=None, open_now=None):
-    url = f"https://api.geoapify.com/v2/places"
+def fetch_healthcare_data(latitude, longitude, radius, care_type):
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     params = {
-        "categories": care_type,
-        "filter": f"circle:{longitude},{latitude},{radius}",
-        "limit": 100,
-        "apiKey": GEOAPIFY_API_KEY,
+        "location": f"{latitude},{longitude}",
+        "radius": radius,
+        "type": care_type,
+        "key": GOOGLE_API_KEY,
     }
-    if wheelchair:
-        params["wheelchair"] = wheelchair
-    if open_now:
-        params["conditions"] = "open_now"
 
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
         facilities = []
-        for feature in data.get("features", []):
-            properties = feature.get("properties", {})
-            geometry = feature.get("geometry", {})
+        for result in data.get("results", []):
             facility = {
-                "name": properties.get("name", "Unknown"),
-                "address": properties.get("formatted", "N/A"),
-                "latitude": geometry.get("coordinates", [])[1],
-                "longitude": geometry.get("coordinates", [])[0],
-                "wheelchair": properties.get("wheelchair", "unknown"),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "unknown") if isinstance(properties.get("opening_hours"), dict) else "unknown",
-                "rating": properties.get("rating", "N/A"),
-                "user_ratings_total": properties.get("user_ratings_total", 0),
+                "name": result.get("name", "Unknown"),
+                "address": result.get("vicinity", "N/A"),
+                "latitude": result["geometry"]["location"]["lat"],
+                "longitude": result["geometry"]["location"]["lng"],
+                "rating": result.get("rating", "No rating"),
+                "user_ratings_total": result.get("user_ratings_total", 0),
+                "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
         return pd.DataFrame(facilities)
     else:
-        st.error(f"Error fetching data from Geoapify: {response.status_code}")
+        st.error(f"Error fetching data from Google Places API: {response.status_code}")
         return pd.DataFrame()
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -144,10 +136,6 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=200000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 
-# New filters
-wheelchair_filter = st.selectbox("Wheelchair Accessibility:", options=["Any", "Yes", "No", "Limited", "Unknown"])
-open_now_filter = st.checkbox("Only show places that are currently open")
-
 if language_code == "es":
     st.caption("Nota: La búsqueda por ubicación tendrá prioridad sobre el botón 'Usar ubicación actual'.")
 else:
@@ -183,9 +171,7 @@ elif location_query:
 
 if st.button("Search", key="search_button"):
     st.write("Fetching data...")
-    wheelchair = None if wheelchair_filter == "Any" else wheelchair_filter.lower()
-    open_now = "true" if open_now_filter else None
-    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "healthcare"), wheelchair, open_now)
+    facilities = fetch_healthcare_data(latitude, longitude, radius, CARE_TYPES.get(care_type, "hospital"))
 
     if facilities.empty:
         st.error("No facilities found. Check your API key, location, or radius.")
@@ -203,7 +189,7 @@ if st.button("Search", key="search_button"):
 
         for _, row in facilities.iterrows():
             color = "gray"  # Default color for unrated
-            if row["rating"] != "N/A" and row["rating"]:
+            if row["rating"] != "No rating" and row["rating"]:
                 if float(row["rating"]) >= 4:
                     color = "green"
                 elif float(row["rating"]) >= 3:
@@ -215,7 +201,7 @@ if st.button("Search", key="search_button"):
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Wheelchair: {row['wheelchair']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
+                popup=f"<b>{row['name']}</b><br>Address: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
                 icon=folium.Icon(color=color)
             ).add_to(m)
 
