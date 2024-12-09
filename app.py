@@ -220,6 +220,8 @@ if st.button("Search"):
                     color = "orange"
                 elif float(row["rating"]) >= 1:
                     color = "yellow"
+            
+            popup = Popup(popup_content, max_width=300)
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
