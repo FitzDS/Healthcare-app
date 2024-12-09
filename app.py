@@ -223,13 +223,7 @@ if st.button("Search"):
 
             folium.Marker(
                 location=[row["latitude"], row["longitude"]],
-                popup=f"""
-                    <b>{row['name']}</b><br>
-                    {t('search_by_location')}: {row['address']}<br>
-                    Open Now: {row['open_now']}<br>
-                    Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}" target="_blank">Get Directions</a>
-                """,
+                popup=f"<b>{row['name']}</b><br>{TRANSLATIONS[language_code]['search_location']}: {row['address']}<br>Open Now: {row['open_now']}<br>Rating: {row['rating']} ({row['user_ratings_total']} reviews)",
                 icon=folium.Icon(color=color)
             ).add_to(m)
 
