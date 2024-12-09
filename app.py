@@ -205,7 +205,7 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
-filter_wheelchair_accessible = st.checkbox("Show only wheelchair accessible entrances", value=False)
+filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
 
 st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 use_current_location = st.button("Use Current Location", key="current_location_button")
