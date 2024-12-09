@@ -96,21 +96,11 @@ def classify_issue_with_openai_cached(issue_description):
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare data using Google Places API with support for multiple healthcare categories.
-
-    Args:
-        latitude (float): Latitude of the search center.
-        longitude (float): Longitude of the search center.
-        radius (int): Search radius in meters.
-        care_type (str or list): Type of healthcare facility to search for (single or multiple).
-        open_only (bool): Whether to include only currently open facilities.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing healthcare facility details.
+    Now also checks for wheelchair accessibility.
     """
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
 
-    # Handle multiple types for "All Healthcare"
     if isinstance(care_type, list):
         types_to_query = care_type
     else:
@@ -132,6 +122,17 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
+                    # Fetch additional details for wheelchair accessibility
+                    place_details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+                    place_params = {
+                        "place_id": result["place_id"],
+                        "key": GOOGLE_API_KEY
+                    }
+                    details_response = requests.get(place_details_url, params=place_params)
+                    if details_response.status_code == 200:
+                        details_data = details_response.json()
+                        wheelchair_accessible = "wheelchair_accessible" in details_data.get("result", {}).get("types", [])
+
                     facilities.append({
                         "name": result.get("name", "Unknown"),
                         "address": result.get("vicinity", "N/A"),
@@ -140,12 +141,12 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
+                        "wheelchair_accessible": wheelchair_accessible,
                     })
 
                 # Check for the next page token
                 next_page_token = data.get("next_page_token")
                 if next_page_token:
-                    # Pause to let the token activate (required by API)
                     import time
                     time.sleep(2)
                     params = {"pagetoken": next_page_token, "key": GOOGLE_API_KEY}
@@ -156,6 +157,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
+
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
