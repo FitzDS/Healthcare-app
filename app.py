@@ -294,6 +294,7 @@ else:
     ).add_to(m)
 
     for _, row in facilities.iterrows():
+        wheelchair_accessible = row.get('wheelchair_accessible_entrance', False)
         # Assign a color based on ratings
         color = "gray"  # Default color for unrated
         if row["rating"] != "No rating" and row["rating"]:
@@ -315,7 +316,7 @@ else:
         Address: {row['address']}<br>
         Open Now: {row['open_now']}<br>
         Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-        Wheelchair Accessible: {"Yes" if row['wheelchair_accessible'] else "No"}<br>
+        Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible'] else "No"}<br>
         <a href="{directions_link}" target="_blank">Get Directions</a>
         """
         folium.Marker(
