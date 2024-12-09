@@ -13,16 +13,13 @@ client = Client(api_key=st.secrets["api_keys"]["openai"])
 GOOGLE_API_KEY = st.secrets["api_keys"]["google"]
 
 CARE_TYPES = {
-    "All Healthcare": "health",
+    "All Healthcare": ["hospital", "pharmacy", "doctor", "dentist", "veterinary_care", "physiotherapist"],
     "Pharmacy": "pharmacy",
     "Hospital": "hospital",
     "Doctor": "doctor",
     "Dentist": "dentist",
-    "Rehabilitation": "physiotherapist",
-    "Emergency": "hospital",
     "Veterinary": "veterinary_care",
-    "Diagnostic Center": "diagnostic_center",
-    "Chiropractor": "chiropractor",
+    "Physiotherapist": "physiotherapist",
 }
 
 LANGUAGES = {"English": "en", "Spanish": "es"}
@@ -79,7 +76,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
         latitude (float): Latitude of the search center.
         longitude (float): Longitude of the search center.
         radius (int): Search radius in meters.
-        care_type (str): Type of healthcare facility to search for ("All Healthcare" means all relevant types).
+        care_type (str or list): Type of healthcare facility to search for (single or multiple).
         open_only (bool): Whether to include only currently open facilities.
 
     Returns:
@@ -88,14 +85,11 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
 
-    # Define the healthcare types to query for "All Healthcare"
-    healthcare_types = [
-        "hospital", "pharmacy", "doctor", "dentist", "veterinary_care",
-        "physiotherapist", "chiropractor", "optometrist", "diagnostic_center"
-    ]
-
-    # If "All Healthcare" is selected, iterate over all healthcare types
-    types_to_query = healthcare_types if care_type == "health" else [care_type]
+    # Handle multiple types for "All Healthcare"
+    if isinstance(care_type, list):
+        types_to_query = care_type
+    else:
+        types_to_query = [care_type]
 
     for care_type_query in types_to_query:
         params = {
@@ -121,7 +115,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
-                        "type": care_type_query
                     })
 
                 # Check for the next page token
@@ -138,10 +131,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
-
-
-
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -215,9 +204,13 @@ elif location_query:
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
 if st.button("Search", key="search_button"):
-    st.write("Fetching data...")
+        st.write("Fetching data...")
     facilities = fetch_healthcare_data_google(
-        latitude, longitude, radius, CARE_TYPES.get(care_type, "health"), open_only=open_only
+        latitude=latitude,
+        longitude=longitude,
+        radius=radius,
+        care_type=CARE_TYPES.get(care_type, "hospital"),
+        open_only=open_only
     )
 
     if facilities.empty:
