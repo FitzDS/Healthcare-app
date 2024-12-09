@@ -107,9 +107,19 @@ def enhance_facility_data_with_google(facility):
 
 
 
-def fetch_healthcare_data(latitude, longitude, radius, care_type):
+def fetch_healthcare_data(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare facilities using the Geoapify Places API.
+
+    Args:
+        latitude (float): Latitude of the location.
+        longitude (float): Longitude of the location.
+        radius (int): Search radius in meters.
+        care_type (str): Category of healthcare (e.g., 'healthcare.hospital').
+        open_only (bool): Whether to include only currently open facilities.
+
+    Returns:
+        pd.DataFrame: A DataFrame with facility information.
     """
     url = f"https://api.geoapify.com/v2/places"
     params = {
@@ -126,6 +136,14 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
         for feature in data.get("features", []):
             properties = feature["properties"]
 
+            # Ensure the facility matches the requested care type
+            if care_type not in properties.get("categories", []):
+                continue
+
+            # Skip facilities that are not open if open_only is True
+            if open_only and not properties.get("opening_hours", {}).get("open_now", False):
+                continue
+
             facility = {
                 "name": properties.get("name", "Unknown"),
                 "address": properties.get("formatted", "N/A"),
@@ -133,8 +151,10 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type):
                 "longitude": feature["geometry"]["coordinates"][0],
                 "rating": properties.get("rating", "No rating"),
                 "user_ratings_total": properties.get("user_ratings_total", 0),
+                "open_now": properties.get("opening_hours", {}).get("open_now", "Unknown"),
             }
             facilities.append(facility)
+
         return pd.DataFrame(facilities)
     else:
         st.error(f"Error fetching data from Geoapify Places API: {response.status_code}")
