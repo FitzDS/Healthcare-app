@@ -96,7 +96,7 @@ def fetch_healthcare_data(latitude, longitude, radius, care_type, wheelchair=Non
                 "latitude": geometry.get("coordinates", [])[1],
                 "longitude": geometry.get("coordinates", [])[0],
                 "wheelchair": properties.get("wheelchair", "unknown"),
-                "open_now": properties.get("opening_hours", {}).get("open_now", "unknown"),
+                "open_now": properties.get("opening_hours", {}).get("open_now", None),
                 "rating": properties.get("rating", None),
             }
             facilities.append(facility)
