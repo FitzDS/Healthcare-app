@@ -227,8 +227,8 @@ st.caption("Note: Search by medicaid only will only take into account California
 
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
 
-st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 use_current_location = st.button("Use Current Location", key="current_location_button")
+st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
 
