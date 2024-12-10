@@ -222,7 +222,7 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
-show_medicaid_only = st.sidebar.checkbox("Show Medicaid-Supported Providers Only")
+show_medicaid_only = st.checkbox("Show Medicaid-Supported Providers Only")
 st.caption("Note: Search by medicaid only will only take into account California.")
 
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
