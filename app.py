@@ -320,7 +320,7 @@ else:
         popup_content = f"""
         <b>{row['name']}</b><br>
         Address: {row['address']}<br>
-        Open Now: {row['open_now']}<br>
+        Open Now: {"Open" if row['open_now'] else "Closed"}<br>
         Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
         Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}<br>
         <a href="{directions_link}" target="_blank">Get Directions</a>
