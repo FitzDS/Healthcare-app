@@ -5,6 +5,8 @@ import geocoder
 from streamlit_folium import st_folium
 import folium
 from openai import Client
+from geopy.distance import geodesic
+
 
 csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/providers_data_with_coordinates_threading.csv"
 
@@ -26,6 +28,16 @@ CARE_TYPES = {
     "Veterinary": "veterinary_care",
     "Physiotherapist": "physiotherapist",
 }
+
+def is_medicaid_supported(lat, lon, medicaid_data, threshold=50):
+    facility_coords = (lat, lon)
+    for _, row in medicaid_data.iterrows():
+        medicaid_coords = (row["latitude"], row["longitude"])
+        distance = geodesic(facility_coords, medicaid_coords).meters
+        if distance <= threshold:  # Match within 50 meters
+            return True
+    return False
+
 
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
@@ -139,11 +151,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     lat = round(result["geometry"]["location"]["lat"], 5)
                     lon = round(result["geometry"]["location"]["lng"], 5)
 
-                    # Determine if facility is Medicaid-supported
-                    medicaid_supported = not medicaid_data[
-                    (medicaid_data["latitude"].round(5) == lat) & 
-                    (medicaid_data["longitude"].round(5) == lon)
-                ].empty
+                    medicaid_supported = is_medicaid_supported(lat, lon, medicaid_data)
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
