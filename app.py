@@ -151,7 +151,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     ]
                     
                     # Determine if the facility is Medicaid-supported using filtered data
-                    medicaid_supported = is_medicaid_supported(lat, lon, medicaid_data_filtered)
+                    medicaid_supported = not medicaid_data_filtered.empty
 
 
                     facilities.append({
