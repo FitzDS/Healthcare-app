@@ -5,3 +5,4 @@ folium
 streamlit-folium
 geocoder
 openai
+geodesic
