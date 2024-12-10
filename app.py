@@ -10,7 +10,8 @@ csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/provider
 
 # Read the CSV file from GitHub
 medicaid_data = pd.read_csv(csv_url)
-
+print("Medicaid Data Sample:")
+print(medicaid_data.head())
 
 # Set up OpenAI client
 client = Client(api_key=st.secrets["api_keys"]["openai"])
