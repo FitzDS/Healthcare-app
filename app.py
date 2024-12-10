@@ -264,7 +264,8 @@ if st.button("Search", key="search_button"):
         longitude=longitude,
         radius=radius,
         care_type=CARE_TYPES.get(care_type, "hospital"),
-        open_only=open_only
+        open_only=open_only,
+        medicaid_data=medicaid_data 
     )
 
     if filter_wheelchair_accessible:
