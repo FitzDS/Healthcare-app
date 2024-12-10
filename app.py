@@ -6,6 +6,12 @@ from streamlit_folium import st_folium
 import folium
 from openai import Client
 
+csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/providers_data_with_coordinates_threading.csv"
+
+# Read the CSV file from GitHub
+medicaid_data = pd.read_csv(csv_url)
+
+
 # Set up OpenAI client
 client = Client(api_key=st.secrets["api_keys"]["openai"])
 
@@ -96,10 +102,13 @@ def classify_issue_with_openai_cached(issue_description):
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare data using Google Places API with support for multiple healthcare categories.
-    Now also checks for wheelchair accessibility using `wheelchair_accessible_entrance` field.
+    Includes information about Medicaid support.
     """
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
+
+    # Load the Medicaid dataset
+    medicaid_data = pd.read_csv("providers_data_with_coordinates_threading.csv")
 
     if isinstance(care_type, list):
         types_to_query = care_type
@@ -130,25 +139,32 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "key": GOOGLE_API_KEY
                     }
                     details_response = requests.get(place_details_url, params=place_params)
-                    wheelchair_accessible = False  # Default to False
                     wheelchair_accessible_entrance = False  # Default to False
 
                     if details_response.status_code == 200:
                         details_data = details_response.json()
-
-                        # Check for wheelchair accessible entrance field
                         result_details = details_data.get("result", {})
                         wheelchair_accessible_entrance = result_details.get("wheelchair_accessible_entrance", False)
 
+                    latitude = result["geometry"]["location"]["lat"]
+                    longitude = result["geometry"]["location"]["lng"]
+
+                    # Check if the facility is Medicaid-supported
+                    medicaid_supported = not medicaid_data[
+                        (medicaid_data["latitude"] == latitude) & (medicaid_data["longitude"] == longitude)
+                    ].empty
+
+                    # Append facility details with Medicaid information
                     facilities.append({
                         "name": result.get("name", "Unknown"),
                         "address": result.get("vicinity", "N/A"),
-                        "latitude": result["geometry"]["location"]["lat"],
-                        "longitude": result["geometry"]["location"]["lng"],
+                        "latitude": latitude,
+                        "longitude": longitude,
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
                         "wheelchair_accessible_entrance": wheelchair_accessible_entrance,
+                        "medicaid_supported": medicaid_supported,  # Add Medicaid info
                     })
 
                 # Check for the next page token
@@ -164,6 +180,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
+
 
 
 
@@ -205,6 +222,9 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
+show_medicaid_only = st.sidebar.checkbox("Show Medicaid-Supported Providers Only")
+st.caption("Note: Search by medicaid only will only take into account California.")
+
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
 
 st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
@@ -261,6 +281,9 @@ if st.button("Search", key="search_button"):
 
 # Retrieve facilities from session state
 facilities = st.session_state["facilities"]
+
+if show_medicaid_only:
+    facilities = facilities[facilities["medicaid_supported"]]
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
@@ -321,6 +344,7 @@ else:
         <b>{row['name']}</b><br>
         Address: {row['address']}<br>
         Open Now: {"Open" if row['open_now'] else "Closed"}<br>
+        Medicaid Supported: {"Yes" if row["medicaid_supported"] else "No"}<br>
         Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
         Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}<br>
         <a href="{directions_link}" target="_blank">Get Directions</a>
