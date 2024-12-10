@@ -144,10 +144,10 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
                     # Filter Medicaid data for the bounding box
                     medicaid_data_filtered = medicaid_data[
-                        (medicaid_data["latitude"] > lat - bounding_box_margin) &
-                        (medicaid_data["latitude"] < lat + bounding_box_margin) &
-                        (medicaid_data["longitude"] > lon - bounding_box_margin) &
-                        (medicaid_data["longitude"] < lon + bounding_box_margin)
+                        (medicaid_data["latitude"] > lat - .02) &
+                        (medicaid_data["latitude"] < lat + .02) &
+                        (medicaid_data["longitude"] > lon - 0.02) &
+                        (medicaid_data["longitude"] < lon + 0.02)
                     ]
                     
                     # Determine if the facility is Medicaid-supported using filtered data
