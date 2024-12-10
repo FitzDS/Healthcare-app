@@ -101,15 +101,10 @@ def classify_issue_with_openai_cached(issue_description):
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False):
     """
     Fetch healthcare data using Google Places API with support for multiple healthcare categories.
-    Includes information about Medicaid support.
+    Now also checks for wheelchair accessibility using `wheelchair_accessible_entrance` field.
     """
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     facilities = []
-
-    # Load the Medicaid dataset
-    medicaid_data = pd.read_csv("providers_data_with_coordinates_threading.csv")
-    medicaid_data["latitude"] = medicaid_data["latitude"].astype(float).round(5)
-    medicaid_data["longitude"] = medicaid_data["longitude"].astype(float).round(5)
 
     if isinstance(care_type, list):
         types_to_query = care_type
@@ -132,30 +127,40 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
-                    # Facility coordinates
-                    latitude = round(result["geometry"]["location"]["lat"], 5)
-                    longitude = round(result["geometry"]["location"]["lng"], 5)
+                    # Debug print for facility details
+                    print(f"Processing facility: {result.get('name', 'Unknown')}")
+                    print(f"Coordinates: {result['geometry']['location']['lat']}, {result['geometry']['location']['lng']}")
 
-                    # Debug prints for each facility
-                    print("Facility:", latitude, longitude)
-                    print("Medicaid Data Sample:")
-                    print(medicaid_data.head())
+                    # Fetch additional details to check for wheelchair accessibility entrance
+                    place_details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+                    place_params = {
+                        "place_id": result["place_id"],
+                        "fields": "name,rating,formatted_phone_number,wheelchair_accessible_entrance",  # Request specific fields
+                        "key": GOOGLE_API_KEY
+                    }
+                    details_response = requests.get(place_details_url, params=place_params)
+                    wheelchair_accessible = False  # Default to False
+                    wheelchair_accessible_entrance = False  # Default to False
 
-                    # Check if Medicaid supported
-                    medicaid_supported = not medicaid_data[
-                        (medicaid_data["latitude"] == latitude) & 
-                        (medicaid_data["longitude"] == longitude)
-                    ].empty
+                    if details_response.status_code == 200:
+                        details_data = details_response.json()
+
+                        # Check for wheelchair accessible entrance field
+                        result_details = details_data.get("result", {})
+                        wheelchair_accessible_entrance = result_details.get("wheelchair_accessible_entrance", False)
+
+                    # Debug print for wheelchair accessible entrance
+                    print(f"Wheelchair Accessible: {wheelchair_accessible_entrance}")
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
                         "address": result.get("vicinity", "N/A"),
-                        "latitude": latitude,
-                        "longitude": longitude,
+                        "latitude": result["geometry"]["location"]["lat"],
+                        "longitude": result["geometry"]["location"]["lng"],
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
-                        "medicaid_supported": medicaid_supported,
+                        "wheelchair_accessible_entrance": wheelchair_accessible_entrance,
                     })
 
                 # Check for the next page token
@@ -171,6 +176,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
+
 
 
 
