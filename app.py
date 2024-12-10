@@ -141,9 +141,9 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
                     # Determine if facility is Medicaid-supported
                     medicaid_supported = not medicaid_data[
-                        (medicaid_data["latitude"] == lat) & 
-                        (medicaid_data["longitude"] == lon)
-                    ].empty
+                    (medicaid_data["latitude"].round(5) == lat) & 
+                    (medicaid_data["longitude"].round(5) == lon)
+                ].empty
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
