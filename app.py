@@ -29,15 +29,6 @@ CARE_TYPES = {
     "Physiotherapist": "physiotherapist",
 }
 
-def is_medicaid_supported(lat, lon, medicaid_data, threshold=50):
-    facility_coords = (lat, lon)
-    for _, row in medicaid_data.iterrows():
-        medicaid_coords = (row["latitude"], row["longitude"])
-        distance = geodesic(facility_coords, medicaid_coords).meters
-        if distance <= threshold:  # Match within 50 meters
-            return True
-    return False
-
 
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
@@ -151,7 +142,17 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     lat = round(result["geometry"]["location"]["lat"], 5)
                     lon = round(result["geometry"]["location"]["lng"], 5)
 
-                    medicaid_supported = is_medicaid_supported(lat, lon, medicaid_data)
+                    # Filter Medicaid data for the bounding box
+                    medicaid_data_filtered = medicaid_data[
+                        (medicaid_data["latitude"] > lat - bounding_box_margin) &
+                        (medicaid_data["latitude"] < lat + bounding_box_margin) &
+                        (medicaid_data["longitude"] > lon - bounding_box_margin) &
+                        (medicaid_data["longitude"] < lon + bounding_box_margin)
+                    ]
+                    
+                    # Determine if the facility is Medicaid-supported using filtered data
+                    medicaid_supported = is_medicaid_supported(lat, lon, medicaid_data_filtered)
+
 
                     facilities.append({
                         "name": result.get("name", "Unknown"),
