@@ -10,8 +10,6 @@ csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/provider
 
 # Read the CSV file from GitHub
 medicaid_data = pd.read_csv(csv_url)
-print("Medicaid Data Sample:")
-print(medicaid_data.head())
 
 # Set up OpenAI client
 client = Client(api_key=st.secrets["api_keys"]["openai"])
@@ -110,6 +108,8 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
 
     # Load the Medicaid dataset
     medicaid_data = pd.read_csv("providers_data_with_coordinates_threading.csv")
+    medicaid_data["latitude"] = medicaid_data["latitude"].astype(float).round(5)
+    medicaid_data["longitude"] = medicaid_data["longitude"].astype(float).round(5)
 
     if isinstance(care_type, list):
         types_to_query = care_type
@@ -132,30 +132,21 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
-                    # Fetch additional details to check for wheelchair accessibility entrance
-                    place_details_url = "https://maps.googleapis.com/maps/api/place/details/json"
-                    place_params = {
-                        "place_id": result["place_id"],
-                        "fields": "name,rating,formatted_phone_number,wheelchair_accessible_entrance",  # Request specific fields
-                        "key": GOOGLE_API_KEY
-                    }
-                    details_response = requests.get(place_details_url, params=place_params)
-                    wheelchair_accessible_entrance = False  # Default to False
+                    # Facility coordinates
+                    latitude = round(result["geometry"]["location"]["lat"], 5)
+                    longitude = round(result["geometry"]["location"]["lng"], 5)
 
-                    if details_response.status_code == 200:
-                        details_data = details_response.json()
-                        result_details = details_data.get("result", {})
-                        wheelchair_accessible_entrance = result_details.get("wheelchair_accessible_entrance", False)
+                    # Debug prints for each facility
+                    print("Facility:", latitude, longitude)
+                    print("Medicaid Data Sample:")
+                    print(medicaid_data.head())
 
-                    latitude = result["geometry"]["location"]["lat"]
-                    longitude = result["geometry"]["location"]["lng"]
-
-                    # Check if the facility is Medicaid-supported
+                    # Check if Medicaid supported
                     medicaid_supported = not medicaid_data[
-                        (medicaid_data["latitude"] == latitude) & (medicaid_data["longitude"] == longitude)
+                        (medicaid_data["latitude"] == latitude) & 
+                        (medicaid_data["longitude"] == longitude)
                     ].empty
 
-                    # Append facility details with Medicaid information
                     facilities.append({
                         "name": result.get("name", "Unknown"),
                         "address": result.get("vicinity", "N/A"),
@@ -164,8 +155,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                         "rating": result.get("rating", "No rating"),
                         "user_ratings_total": result.get("user_ratings_total", 0),
                         "open_now": result.get("opening_hours", {}).get("open_now", "Unknown"),
-                        "wheelchair_accessible_entrance": wheelchair_accessible_entrance,
-                        "medicaid_supported": medicaid_supported,  # Add Medicaid info
+                        "medicaid_supported": medicaid_supported,
                     })
 
                 # Check for the next page token
@@ -181,6 +171,7 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
+
 
 
 
