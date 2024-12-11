@@ -301,19 +301,20 @@ st.markdown("""
 <style>
 .legend-container {
     border: 1px solid #ddd;
-    border-radius: 12px;
+    border-radius: 15px;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     margin-top: 20px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .legend-container h3 {
-    color: #3A405A;
+    color: #2b2e4a;
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
-    text-align: center;
-    margin-bottom: 15px;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 .legend-container ul {
@@ -323,32 +324,28 @@ st.markdown("""
 }
 
 .legend-container li {
-    margin: 10px 0;
+    margin: 15px 0;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .legend-container li span {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     margin-right: 10px;
 }
 
-.legend-container li:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease-in-out;
-}
-
-.color-red { background-color: red; }
-.color-green { background-color: green; }
-.color-blue { background-color: blue; }
-.color-orange { background-color: orange; }
-.color-yellow { background-color: yellow; }
-.color-gray { background-color: gray; }
+.color-red { background-color: #ff6b6b; } /* Soft Red */
+.color-green { background-color: #81c784; } /* Soft Green */
+.color-blue { background-color: #64b5f6; } /* Soft Blue */
+.color-orange { background-color: #ffb74d; } /* Soft Orange */
+.color-yellow { background-color: #fff176; } /* Soft Yellow */
+.color-gray { background-color: #cfd8dc; } /* Soft Gray */
 </style>
 
 <div class="legend-container">
@@ -363,6 +360,7 @@ st.markdown("""
     </ul>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 location_query = st.text_input("Search by Location:")
