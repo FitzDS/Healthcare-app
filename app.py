@@ -453,17 +453,3 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-        .stCheckbox div {
-            font-size: 16px;
-            color: #333;
-            font-weight: bold;
-        }
-        .stCheckbox label {
-            font-size: 18px;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-show_medicaid_only = st.checkbox("Show Medicaid-Supported Providers Only")
