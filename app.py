@@ -569,10 +569,10 @@ st.markdown("""
 /* Full-page gradient background */
 div[data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px;
+    padding: 50px; /* Add spacing around the app */
 }
 
-/* Geometric shapes for visual appeal */
+/* Add geometric shapes for visual appeal */
 div[data-testid="stAppViewContainer"]::before {
     content: '';
     position: absolute;
@@ -599,19 +599,21 @@ div[data-testid="stAppViewContainer"]::after {
     filter: blur(100px);
 }
 
-/* White content box styling */
+/* Force wider width for the main container */
 section.main {
-    width: 90% !important; /* Force box to take 90% of the screen width */
-    max-width: 1400px; /* Limit the width for very wide screens */
+    width: 95% !important; /* Set the box to 95% of the screen width */
+    max-width: 1400px; /* Ensure it doesn't stretch too wide */
     margin: auto;
+    padding: 0;
 }
 
+/* Style the white content box */
 div[data-testid="stVerticalBlock"] {
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     padding: 50px;
-    width: 100%;
+    width: 100%; /* Expand to fill the main container */
     text-align: left;
 }
 </style>
