@@ -290,18 +290,31 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-if not st.session_state["search_clicked"]:
-    st.session_state["search_clicked"] = True
-    # Simulate a search action when the page is loaded for the first time
+def perform_search():
+    st.write("Fetching data...")
+
+    # Fetch facilities using Google API
     facilities = fetch_healthcare_data_google(
         latitude=st.session_state["latitude"],
         longitude=st.session_state["longitude"],
         radius=20000,  # Default radius
-        care_type="hospital",  # Default care type (or leave it as "All Healthcare")
+        care_type="hospital",  # Default care type
         open_only=True,
         medicaid_data=medicaid_data
     )
-    st.session_state["facilities"] = facilities  # Store the result in session state
+
+    # Store the result in session state
+    st.session_state["facilities"] = facilities
+    st.session_state["search_clicked"] = True  # Mark that the search was triggered
+
+# Automatically trigger the search logic when the page is loaded
+if not st.session_state["search_clicked"]:
+    perform_search()
+
+
+# After the search has been performed, retrieve the facilities and display them
+facilities = st.session_state.get("facilities", pd.DataFrame())
+
 
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
