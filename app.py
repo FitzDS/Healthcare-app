@@ -566,47 +566,47 @@ else:
 
 st.markdown("""
 <style>
-/* Apply gradient background to the full app */
+/* Full-page gradient background */
 div[data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px;
+    padding: 50px; /* Padding around the app for spacing */
 }
 
-/* Add geometric shapes to the background */
+/* Geometric shapes for visual appeal */
 div[data-testid="stAppViewContainer"]::before {
     content: '';
     position: absolute;
-    top: -100px;
-    left: -150px;
-    width: 400px;
-    height: 400px;
+    top: -150px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     z-index: -1;
-    filter: blur(75px);
+    filter: blur(100px);
 }
 
 div[data-testid="stAppViewContainer"]::after {
     content: '';
     position: absolute;
-    bottom: -100px;
-    right: -150px;
-    width: 300px;
-    height: 300px;
+    bottom: -150px;
+    right: -200px;
+    width: 400px;
+    height: 400px;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     z-index: -1;
-    filter: blur(75px);
+    filter: blur(100px);
 }
 
-/* Widen and style the main content container */
+/* White content box styling */
 div[data-testid="stVerticalBlock"] {
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-    padding: 40px;
-    max-width: 1100px; /* Increase width */
-    margin: auto;
+    padding: 50px; /* Adjust inner padding for content */
+    max-width: 1200px; /* Widen the box */
+    margin: auto; /* Center the box */
     text-align: left;
 }
 </style>
