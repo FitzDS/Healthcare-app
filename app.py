@@ -138,20 +138,31 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                     if open_only and not result.get("opening_hours", {}).get("open_now", False):
                         continue
 
+                    VALID_MEDICAID_CATEGORIES = ["hospital", "pharmacy", "doctor", "dentist", "physiotherapist"]
                     # Facility coordinates
                     lat = round(result["geometry"]["location"]["lat"], 5)
                     lon = round(result["geometry"]["location"]["lng"], 5)
 
-                    # Filter Medicaid data for the bounding box
-                    medicaid_data_filtered = medicaid_data[
-                        (medicaid_data["latitude"] > lat - 0.0001) &
-                        (medicaid_data["latitude"] < lat + 0.0001) &
-                        (medicaid_data["longitude"] > lon - 0.0001) &
-                        (medicaid_data["longitude"] < lon + 0.0001)
-                    ]
+                    facility_category = result.get("types", [])
+                    is_medicaid_supported_category = any(
+                    category in VALID_MEDICAID_CATEGORIES for category in facility_category
+                    )
+
+                    
+                    if is_medicaid_supported_category:
+                    # Filter Medicaid data for the bounding box (e.g., 0.0001 degrees margin for proximity)
+                        medicaid_data_filtered = medicaid_data[
+                            (medicaid_data["latitude"] > lat - 0.0001) &
+                            (medicaid_data["latitude"] < lat + 0.0001) &
+                            (medicaid_data["longitude"] > lon - 0.0001) &
+                            (medicaid_data["longitude"] < lon + 0.0001)
+                        ]
+    
                     
                     # Determine if the facility is Medicaid-supported using filtered data
-                    medicaid_supported = not medicaid_data_filtered.empty
+                     medicaid_supported = not medicaid_data_filtered.empty
+                    else:
+                        medicaid_supported = False  # Not a valid category, so it's not Medicaid-supported
 
 
                     facilities.append({
