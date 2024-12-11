@@ -269,15 +269,17 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-# Ensure facilities are stored in session state
-# Ensure facilities are stored in session state
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
 
-
-
+# Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
+    # Initialize session state for map and facilities only when Search button is clicked
+    if "map" not in st.session_state:
+        st.session_state["map"] = None
+    if "facilities" not in st.session_state:
+        st.session_state["facilities"] = pd.DataFrame()  # Empty DataFrame initially
+
     st.write("Fetching data...")
+
     # Fetch facilities using Google API
     facilities = fetch_healthcare_data_google(
         latitude=latitude,
@@ -285,28 +287,29 @@ if st.button("Search", key="search_button"):
         radius=radius,
         care_type=CARE_TYPES.get(care_type, "hospital"),
         open_only=open_only,
-        medicaid_data=medicaid_data 
+        medicaid_data=medicaid_data
     )
 
     # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
     if show_medicaid_only:
         try:
-            # Check if the 'medicaid_supported' column exists and filter accordingly
             if "medicaid_supported" in facilities.columns:
                 facilities = facilities[facilities["medicaid_supported"]]
             else:
                 st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
         except KeyError as e:
-            # Handle the exception gracefully, without showing it to the user
             st.warning(f"KeyError: {e} - 'medicaid_supported' column not found. The filter is being ignored.")
     
-    # Store the fetched facilities in session state
+    # Apply wheelchair filter if needed
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
 
+    # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
-facilities = st.session_state["facilities"]
+# Retrieve facilities from session state
+facilities = st.session_state.get("facilities", pd.DataFrame())  # Safely retrieve facilities from session state
+
 
     # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
     try:
