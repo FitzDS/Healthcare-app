@@ -231,7 +231,12 @@ def get_current_location():
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
 
-st.title("Global Healthcare Facility Locator")
+st.markdown("""
+<div style="background-color:#4CAF50; padding:10px; border-radius:5px; text-align:center;">
+    <h1 style="color:white;">Global Healthcare Facility Locator</h1>
+    <p style="color:white;">Find the care you need, wherever you are.</p>
+</div>
+""", unsafe_allow_html=True)
 
 # Add legend above the map
 st.markdown(f"""### Legend
@@ -274,7 +279,7 @@ st.caption("Note: Search by medicaid-supported providers will only take into acc
 
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
 
-use_current_location = st.button("Use Current Location", key="current_location_button")
+use_current_location = st.button("📍 Use Current Location", key="current_location_button")
 st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
@@ -469,4 +474,19 @@ st.markdown("""
     </a>
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    .important-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    </style>
+    <a href="https://feedback-form.com" target="_blank" class="important-button">📝 Provide Feedback</a>
+""", unsafe_allow_html=True)
+
 
