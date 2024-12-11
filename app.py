@@ -15,9 +15,6 @@ if "map" not in st.session_state:
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
-if "search_clicked" not in st.session_state:
-    st.session_state["search_clicked"] = False
-
 # Initialize session state with default location (Davis, CA coordinates)
 if "latitude" not in st.session_state:
     st.session_state["latitude"] = 38.5449  # Latitude for Davis, CA
@@ -256,7 +253,7 @@ radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, s
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
 open_only = st.checkbox("Show only open facilities")
-show_medicaid_only = st.checkbox("Show Medicaid-Supported Providers Only")
+#show_medicaid_only = st.checkbox("Show Medicaid-Supported Providers Only")
 st.caption("Note: Search by medicaid only will only take into account California.")
 
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
@@ -289,29 +286,6 @@ elif location_query:
         latitude = lat
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
-
-def perform_search():
-    st.write("hello")
-    st.write("Fetching data...")
-
-    # Fetch facilities using Google API
-    facilities = fetch_healthcare_data_google(
-        latitude=st.session_state["latitude"],
-        longitude=st.session_state["longitude"],
-        radius=20000,  # Default radius
-        care_type="hospital",  # Default care type
-        open_only=True,
-        medicaid_data=medicaid_data
-    )
-
-    # Store the result in session state
-    st.session_state["facilities"] = facilities
-    st.session_state["search_clicked"] = True  # Mark that the search was triggered
-
-
-# Perform search only on first load, and not on subsequent interactions
-if not st.session_state["search_clicked"]:
-    perform_search()  # Directly call perform_search to trigger the search when the pa
 
 
 # After the search has been performed, retrieve the facilities and display them
@@ -468,6 +442,22 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+
+st.markdown("""
+    <style>
+        .stCheckbox div {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+        .stCheckbox label {
+            font-size: 18px;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+show_medicaid_only = st.checkbox("Show Medicaid-Supported Providers Only")
 
 st.markdown("""
 <div style="text-align: center;">
