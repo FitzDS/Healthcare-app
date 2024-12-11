@@ -33,11 +33,11 @@ CARE_TYPES = {
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
-if "facilities" not in st.session_state:
+if "facilities" .session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 # Ensure the current location marker is persistent
-if "current_location_marker" not in st.session_state:
+if "current_location_marker" .session_state:
     st.session_state["current_location_marker"] = None
 
 @st.cache_data
@@ -271,7 +271,7 @@ elif location_query:
 
 # Ensure facilities are stored in session state
 # Ensure facilities are stored in session state
-if "facilities" not in st.session_state:
+if "facilities" .session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 
@@ -322,13 +322,14 @@ else:
     st.sidebar.warning("No facilities found nearby.")
 
 # Ensure facilities are stored in session state
+# Ensure facilities are stored in session state
 if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 # Retrieve facilities from session state
 facilities = st.session_state["facilities"]
 
-# Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
+# Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated and the column exists
 if show_medicaid_only:
     if not facilities.empty:
         if "medicaid_supported" in facilities.columns:
