@@ -427,6 +427,23 @@ elif location_query:
 facilities = st.session_state.get("facilities", pd.DataFrame())
 
 
+def update_sidebar(facilities):
+    st.sidebar.title("Nearby Locations")
+    if not facilities.empty:
+        facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
+        sorted_facilities = facilities.sort_values(by="rating", ascending=False)
+        for _, row in sorted_facilities.iterrows():
+            st.sidebar.markdown(f"""
+            **{row['name']}**
+            - Address: {row['address']}
+            - Rating: {row['rating']} ⭐
+            - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
+            - Distance: {row.get('distance', 'N/A')} km
+            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
+            """)
+    else:
+        st.sidebar.warning("No facilities found nearby.")
+
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
 
@@ -500,22 +517,6 @@ else:
     st.sidebar.warning("No facilities found nearby.")
 
 
-def update_sidebar(facilities):
-    st.sidebar.title("Nearby Locations")
-    if not facilities.empty:
-        facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
-        sorted_facilities = facilities.sort_values(by="rating", ascending=False)
-        for _, row in sorted_facilities.iterrows():
-            st.sidebar.markdown(f"""
-            **{row['name']}**
-            - Address: {row['address']}
-            - Rating: {row['rating']} ⭐
-            - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
-            - Distance: {row.get('distance', 'N/A')} km
-            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
-            """)
-    else:
-        st.sidebar.warning("No facilities found nearby.")
 
 # Ensure facilities are stored in session state
 # Ensure facilities are stored in session state
