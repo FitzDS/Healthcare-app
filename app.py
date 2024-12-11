@@ -233,67 +233,60 @@ def get_current_location():
 
 st.markdown("""
 <style>
-/* Container Styling */
+/* Header Container */
 .header-container {
-    background: linear-gradient(135deg, #6a1b9a, #283593, #0288d1, #26c6da);
-    background-size: 400% 400%; /* Animated gradient */
-    animation: gradientAnimation 15s ease infinite;
-    padding: 50px 20px;
+    background-color: #2b2e4a;
+    padding: 50px;
     border-radius: 12px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    color: white;
     position: relative;
     overflow: hidden;
+    color: white;
 }
 
-/* Text Styling */
-.header-container h1 {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 900;
-    font-size: 42px;
-    margin: 0;
-    text-shadow: 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.header-container p {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 300;
-    font-size: 20px;
-    margin: 10px 0 0 0;
-    letter-spacing: 0.5px;
-}
-
-/* Subtle Shapes */
+/* Geometric Shapes */
 .header-container::before,
 .header-container::after {
     content: '';
     position: absolute;
     border-radius: 50%;
     filter: blur(75px);
+    z-index: 0;
 }
 
 .header-container::before {
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.1);
+    width: 300px;
+    height: 300px;
+    background: rgba(76, 175, 80, 0.1); /* Light green glow */
     top: -50px;
     left: -50px;
 }
 
 .header-container::after {
-    width: 300px;
-    height: 300px;
-    background: rgba(255, 255, 255, 0.15);
+    width: 350px;
+    height: 350px;
+    background: rgba(3, 169, 244, 0.15); /* Blue glow */
     bottom: -60px;
     right: -60px;
 }
 
-/* Gradient Animation */
-@keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* Title Styling */
+.header-container h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    font-size: 42px;
+    margin: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.header-container p {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    margin-top: 10px;
+    z-index: 1;
+    position: relative;
 }
 </style>
 
