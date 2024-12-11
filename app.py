@@ -271,7 +271,7 @@ elif location_query:
 
 # Ensure facilities are stored in session state
 # Ensure facilities are stored in session state
-if "facilities" .session_state:
+if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 
@@ -308,15 +308,15 @@ if st.button("Search", key="search_button"):
 
 facilities = st.session_state["facilities"]
 
-# Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-try:
-    # Your code that may raise a KeyError
-    facilities = facilities[facilities["medicaid_supported"]]
-except KeyError as e:
-    # Handle the exception gracefully, without showing it to the user
-    print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
-    # You can choose not to do anything here to continue execution
-    pass
+    # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
+    try:
+        # Your code that may raise a KeyError
+        facilities = facilities[facilities["medicaid_supported"]]
+    except KeyError as e:
+        # Handle the exception gracefully, without showing it to the user
+        print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
+        # You can choose not to do anything here to continue execution
+        pass
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
