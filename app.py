@@ -566,35 +566,24 @@ else:
 
 st.markdown("""
 <style>
-/* Apply a bold background to the whole app */
-body {
-    background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 0;
-    margin: 0;
-}
-
-/* Adjust Streamlit's main app container */
+/* Full app background gradient */
 div[data-testid="stAppViewContainer"] {
-    background: none; /* Remove Streamlit's default background */
-    padding-top: 50px;
-    padding-bottom: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: linear-gradient(135deg, #2b2e4a, #4a5568);
+    padding: 50px; /* Adds padding around the app content */
 }
 
-/* Create a white container for all inputs */
+/* White rectangle for content area */
 div[data-testid="stVerticalBlock"] {
-    background: white;
+    background-color: white;
     border-radius: 15px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     padding: 30px;
-    width: 80%;
     max-width: 800px;
-    margin: auto;
+    margin: auto; /* Center the content area */
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
