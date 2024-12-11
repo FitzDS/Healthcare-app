@@ -337,10 +337,15 @@ if "facilities" not in st.session_state:
 # Retrieve facilities from session state
 facilities = st.session_state["facilities"]
 
+if show_medicaid_only:
+    if "medicaid_supported" in facilities.columns:
+        facilities = facilities[facilities["medicaid_supported"]]
+    else:
+        st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
 
 # Check if facilities are empty to display map or error message
 if facilities.empty:
-    st.error("No facilities found. Check your API key, location, or radius.")
+    st.error("No facilities found. Check your location or radius.")
     st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
 else:
     st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
