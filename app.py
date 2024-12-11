@@ -563,59 +563,48 @@ else:
 
 st.markdown("""
 <style>
-/* Overall App Background */
-html, body, [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Calm greenish background */
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
+/* Full App Background */
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Subtle green gradient */
     padding: 0;
 }
 
 /* White Content Box */
-div[data-testid="stVerticalBlock"] > div {
-    background: white;
-    border-radius: 12px;
+[data-testid="stVerticalBlock"] > div {
+    background-color: white;
+    border-radius: 15px;
     padding: 20px 30px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
+    width: 90%;
     max-width: 800px;
 }
 
-/* Style for Buttons */
+/* Styled Button */
 button[kind="primary"] {
     background: linear-gradient(135deg, #43a047, #2e7d32);
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: all 0.3s ease;
 }
 
 button[kind="primary"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.03);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Style for Sliders */
+/* Styled Slider */
 [data-testid="stSlider"] {
-    padding: 10px 0;
-    font-family: 'Roboto', sans-serif;
     color: #333;
+    font-family: 'Roboto', sans-serif;
+    padding: 10px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Add content inside the styled white box
-st.markdown('<div class="content-box">', unsafe_allow_html=True)
-
-# Your sliders, buttons, and inputs
-st.slider("Search Radius (km):", min_value=0, max_value=50, value=25)
-st.button("Search")
-
-# Close white box
-st.markdown('</div>', unsafe_allow_html=True)
 
