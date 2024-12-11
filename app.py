@@ -290,6 +290,9 @@ if st.button("Search", key="search_button"):
 
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
+    if show_medicaid_only:
+        facilities = facilities[facilities['medicaid_supported'] == True]
+        
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
@@ -323,17 +326,6 @@ if "facilities" not in st.session_state:
 
 # Retrieve facilities from session state
 facilities = st.session_state["facilities"]
-
-    # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated and the column exists
-    if show_medicaid_only:
-        if not facilities.empty:
-            if "medicaid_supported" in facilities.columns:
-                # Apply the filter if the column exists
-                facilities = facilities[facilities["medicaid_supported"]]
-            else:
-                st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
-        else:
-            st.warning("No facilities found. Please search for healthcare facilities first.")
 
 
 # Check if facilities are empty to display map or error message
