@@ -560,49 +560,83 @@ else:
 
 st.markdown("""
 <style>
-/* Page Background */
+/* Full Page Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Matching green gradient */
-    padding: 20px; /* Add padding to avoid cramped content */
+    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Subtle green gradient */
+    padding: 20px;
+    color: white;
 }
 
-/* Input and Legend Boxes */
-.input-container, .legend-container {
+/* General Card Style (Legend and Input Box) */
+.card-container {
     background-color: white;
     border-radius: 12px;
     padding: 20px 30px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
     margin: 20px auto;
-    width: 90%;
-    max-width: 800px; /* Consistent max width */
+    max-width: 800px; /* Keep a consistent width */
     font-family: 'Roboto', sans-serif;
 }
 
-/* Section Titles */
-.input-container h3, .legend-container h3 {
-    margin-top: 0;
-    color: #2e7d32; /* Title box green */
+/* Legend Styling */
+.legend-container h3 {
+    color: #2e7d32;
     font-size: 20px;
     font-weight: bold;
+    margin-bottom: 15px;
     text-transform: uppercase;
     text-align: center;
 }
 
-/* Inputs Styling */
-input, select, textarea {
-    background-color: #f9f9f9 !important;
-    border: 1px solid #ccc !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px !important;
-    color: #333 !important;
-    margin-bottom: 15px;
-    width: 100%;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+.legend-container ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-/* Buttons Styling */
+.legend-container li {
+    margin: 10px 20px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+}
+
+.legend-container li span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+/* Input Section Styling */
+.input-container h3 {
+    color: #2e7d32;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input, select, textarea {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.stSlider {
+    padding: 10px 0;
+}
+
 button[kind="primary"] {
     background: linear-gradient(135deg, #43a047, #2e7d32);
     color: white;
