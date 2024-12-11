@@ -322,7 +322,10 @@ if st.button("Search", key="search_button"):
     if "facilities" not in st.session_state:
         st.session_state["facilities"] = pd.DataFrame()  # Empty DataFrame initially
     
-    st.write("Fetching data...")
+    with st.spinner("Fetching data..."):
+    # Perform API or data fetch
+        time.sleep(2)  # Example for delay
+    st.success("Data loaded successfully!")
 
     # Fetch facilities using Google API
     facilities = fetch_healthcare_data_google(
@@ -475,18 +478,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
 st.markdown("""
-    <style>
-    .important-button {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-    }
-    </style>
-    <a href="https://feedback-form.com" target="_blank" class="important-button">📝 Provide Feedback</a>
+    <hr>
+    <div style="text-align:center; color:gray;">
+        <p>© 2024 Healthcare Facility Locator. All rights reserved.</p>
+        <p>Powered by Streamlit, Google Maps API, and OpenAI.</p>
+    </div>
 """, unsafe_allow_html=True)
 
 
