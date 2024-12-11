@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import requests
@@ -5,7 +6,6 @@ import geocoder
 from streamlit_folium import st_folium
 import folium
 from openai import Client
-import time
 
 #sys.stderr = open(os.devnull, 'w')
 
@@ -297,33 +297,16 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
 # Add legend above the map
-st.markdown("""
-<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
-    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
-    <ul style="list-style-type: none; padding: 0;">
-        <li style="margin: 5px 0;">
-            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
-        </li>
-    </ul>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(f"""### Legend
+- **Red Marker**: Current Location
+- **Rating Colors**:
+  - **Green**: 4-5 Stars
+  - **Blue**: 3-4 Stars
+  - **Orange**: 2-3 Stars
+  - **Yellow**: 1-2 Stars
+  - **Gray**: Unrated or 0-1 Stars
+""")
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
@@ -355,7 +338,7 @@ st.caption("Note: Search by medicaid-supported providers will only take into acc
 
 filter_wheelchair_accessible = st.checkbox("Show only locations with wheelchair accessible entrances", value=False)
 
-use_current_location = st.button("📍 Use Current Location", key="current_location_button")
+use_current_location = st.button("Use Current Location", key="current_location_button")
 st.caption("Note: Search by location will take precedence over the 'Use Current Location' button.")
 latitude = st.number_input("Latitude", value=38.5449)
 longitude = st.number_input("Longitude", value=-121.7405)
@@ -398,10 +381,7 @@ if st.button("Search", key="search_button"):
     if "facilities" not in st.session_state:
         st.session_state["facilities"] = pd.DataFrame()  # Empty DataFrame initially
     
-    with st.spinner("Fetching data..."):
-    # Perform API or data fetch
-        time.sleep(2)  # Example for delay
-    st.success("Data loaded successfully!")
+    st.write("Fetching data...")
 
     # Fetch facilities using Google API
     facilities = fetch_healthcare_data_google(
@@ -542,3 +522,14 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+
+
+
+st.markdown("""
+<div style="text-align: center;">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog" target="_blank" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+        📝 Fill Out Feedback Form
+    </a>
+</div>
+""", unsafe_allow_html=True)
