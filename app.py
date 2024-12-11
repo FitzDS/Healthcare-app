@@ -53,15 +53,6 @@ else:
     st.session_state["current_location_marker"] = None
     current_location_marker = None
 
-facilities = fetch_healthcare_data_google(
-    latitude=st.session_state["latitude"],
-    longitude=st.session_state["longitude"],
-    radius=radius,
-    care_type=CARE_TYPES.get(care_type, "hospital"),
-    open_only=open_only,
-    medicaid_data=medicaid_data
-)
-
 
 @st.cache_data
 def classify_issue_with_openai_cached(issue_description):
