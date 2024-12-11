@@ -605,7 +605,7 @@ div[data-testid="stVerticalBlock"] {
     border-radius: 20px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     padding: 50px; /* Adjust inner padding for content */
-    max-width: 1200px; /* Widen the box */
+    max-width: 2000px; /* Widen the box */
     margin: auto; /* Center the box */
     text-align: left;
 }
