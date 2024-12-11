@@ -8,6 +8,22 @@ from openai import Client
 from geopy.distance import geodesic
 
 
+# Initialize session state for map, facilities, and search flag
+if "map" not in st.session_state:
+    st.session_state["map"] = None
+
+if "facilities" not in st.session_state:
+    st.session_state["facilities"] = pd.DataFrame()
+
+if "search_clicked" not in st.session_state:
+    st.session_state["search_clicked"] = False
+
+# Initialize session state with default location (Davis, CA coordinates)
+if "latitude" not in st.session_state:
+    st.session_state["latitude"] = 38.5449  # Latitude for Davis, CA
+if "longitude" not in st.session_state:
+    st.session_state["longitude"] = -121.7405  # Longitude for Davis, CA
+
 csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/providers_data_with_coordinates_threading.csv"
 
 # Read the CSV file from GitHub
@@ -30,15 +46,20 @@ CARE_TYPES = {
 }
 
 
-# Initialize session state for map and facilities
-if "map" not in st.session_state:
-    st.session_state["map"] = None
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
 
 # Ensure the current location marker is persistent
 if "current_location_marker" .session_state:
     st.session_state["current_location_marker"] = None
+
+facilities = fetch_healthcare_data_google(
+    latitude=st.session_state["latitude"],
+    longitude=st.session_state["longitude"],
+    radius=radius,
+    care_type=CARE_TYPES.get(care_type, "hospital"),
+    open_only=open_only,
+    medicaid_data=medicaid_data
+)
+
 
 @st.cache_data
 def classify_issue_with_openai_cached(issue_description):
@@ -269,15 +290,10 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()  # Empty DataFrame initially
-if "search_clicked" not in st.session_state:
-    st.session_state["search_clicked"] = False  # Flag to track if search button was clicked
+
 
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
-
-    st.session_state["search_clicked"] = True
 
     # Initialize session state for map and facilities only when Search button is clicked
     if "map" not in st.session_state:
