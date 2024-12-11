@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 import folium
 from openai import Client
 
-sys.stderr = open(os.devnull, 'w')
+#sys.stderr = open(os.devnull, 'w')
 
 # Initialize session state for map, facilities, and search flag
 if "map" not in st.session_state:
