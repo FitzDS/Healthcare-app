@@ -569,10 +569,10 @@ st.markdown("""
 /* Full-page gradient background */
 div[data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px; /* Padding around the app for spacing */
+    padding: 50px; /* Add spacing around the app */
 }
 
-/* Geometric shapes for visual appeal */
+/* Add geometric shapes for design */
 div[data-testid="stAppViewContainer"]::before {
     content: '';
     position: absolute;
@@ -604,9 +604,10 @@ div[data-testid="stVerticalBlock"] {
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-    padding: 50px; /* Adjust inner padding for content */
-    max-width: 2000px; /* Widen the box */
-    margin: auto; /* Center the box */
+    padding: 50px;
+    width: 90%; /* Force wider width */
+    max-width: 1200px; /* Prevent it from being too wide on large screens */
+    margin: auto;
     text-align: left;
 }
 </style>
