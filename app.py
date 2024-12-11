@@ -308,8 +308,7 @@ def perform_search():
     st.session_state["search_clicked"] = True  # Mark that the search was triggered
 
 # Automatically trigger the search logic when the page is loaded
-if not st.session_state["search_clicked"]:
-    perform_search()
+perform_search()
 
 
 # After the search has been performed, retrieve the facilities and display them
