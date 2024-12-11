@@ -45,8 +45,13 @@ CARE_TYPES = {
 
 
 # Ensure the current location marker is persistent
-if "current_location_marker".session_state:
+if "current_location_marker" in st.session_state:
+    # Access or modify the session state variable
+    current_location_marker = st.session_state["current_location_marker"]
+else:
+    # Initialize the session state variable if it doesn't exist
     st.session_state["current_location_marker"] = None
+    current_location_marker = None
 
 facilities = fetch_healthcare_data_google(
     latitude=st.session_state["latitude"],
