@@ -5,8 +5,8 @@ import geocoder
 from streamlit_folium import st_folium
 import folium
 from openai import Client
-from geopy.distance import geodesic
 
+sys.stderr = open(os.devnull, 'w')
 
 # Initialize session state for map, facilities, and search flag
 if "map" not in st.session_state:
