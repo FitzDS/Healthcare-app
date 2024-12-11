@@ -297,13 +297,13 @@ if st.button("Search", key="search_button"):
 
 facilities = st.session_state["facilities"]
 
+# Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
 if show_medicaid_only:
     if not facilities.empty:
-        try:
-            # Try to filter using 'medicaid_supported' column
+        # Check if the 'medicaid_supported' column exists before applying the filter
+        if 'medicaid_supported' in facilities.columns:
             facilities = facilities[facilities["medicaid_supported"]]
-        except KeyError:
-            # If the 'medicaid_supported' column is missing, simply ignore the error and show a warning
+        else:
             st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
     else:
         st.warning("No facilities found. Please search for healthcare facilities first.")
