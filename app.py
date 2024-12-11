@@ -194,8 +194,8 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 # Check for the next page token
                 next_page_token = data.get("next_page_token")
                 if next_page_token:
-                    import time
-                    time.sleep(2)
+                    #import time
+                    #time.sleep(2)
                     params = {"pagetoken": next_page_token, "key": GOOGLE_API_KEY}
                 else:
                     break
