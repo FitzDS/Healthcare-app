@@ -293,15 +293,6 @@ if st.button("Search", key="search_button"):
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
-# Retrieve facilities from session state
-'''facilities = st.session_state["facilities"]
-
-if show_medicaid_only and not facilities.empty:
-    if "medicaid_supported" in facilities.columns:
-        # Apply the filter only if the column exists
-        facilities = facilities[facilities["medicaid_supported"]]
-    else:
-        st.warning("No Medicaid data available. Please search first.")'''
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
