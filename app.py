@@ -323,9 +323,10 @@ st.markdown("""
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    max-width: 400px;
+    margin: 20px auto;
+    max-width: 600px; /* Wider for alignment with header */
     font-family: 'Roboto', sans-serif;
+    text-align: center; /* Center-align content */
 }
 
 /* Legend Title */
@@ -333,7 +334,8 @@ st.markdown("""
     margin-top: 0;
     color: #2e7d32;
     font-size: 18px;
-    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 /* Legend List */
@@ -341,12 +343,15 @@ st.markdown("""
     list-style: none;
     padding: 0;
     margin: 10px 0 0;
+    display: flex; /* Align items horizontally */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: space-around; /* Equal spacing between items */
 }
 
 .legend-list li {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin: 10px 15px; /* Adjust spacing for compactness */
     font-size: 14px;
     color: #333;
 }
@@ -358,32 +363,11 @@ st.markdown("""
     margin-right: 10px;
     border-radius: 50%;
 }
-
-/* Legend Colors */
-.legend-red { background-color: red; }
-.legend-green { background-color: green; }
-.legend-blue { background-color: blue; }
-.legend-orange { background-color: orange; }
-.legend-yellow { background-color: yellow; }
-.legend-gray { background-color: gray; }
 </style>
 """, unsafe_allow_html=True)
 
-# HTML for the Legend
-st.markdown("""
-<div class="legend-container">
-    <h3>Map Legend</h3>
-    <ul class="legend-list">
-        <li><span class="legend-red"></span> <strong>Current Location</strong></li>
-        <li><span class="legend-green"></span> 4-5 Stars</li>
-        <li><span class="legend-blue"></span> 3-4 Stars</li>
-        <li><span class="legend-orange"></span> 2-3 Stars</li>
-        <li><span class="legend-yellow"></span> 1-2 Stars</li>
-        <li><span class="legend-gray"></span> Unrated or 0-1 Stars</li>
-    </ul>
-</div>
-""", unsafe_allow_html=True)
 
+st.markdown('<div class="input-container">', unsafe_allow_html=True)
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
@@ -603,37 +587,50 @@ else:
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
 
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 st.markdown("""
 <style>
-/* Dropdown (select) Styling */
-[data-baseweb="select"] {
-    background-color: white !important;
+/* Input Section Container */
+.input-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Section Titles */
+.input-container h3 {
+    margin-top: 0;
+    color: #2e7d32;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Inputs Styling */
+input, select, textarea {
+    background-color: #f9f9f9 !important;
     border: 1px solid #ccc !important;
     border-radius: 8px !important;
-    padding: 5px 10px !important;
+    padding: 10px !important;
     font-family: 'Roboto', sans-serif;
     font-size: 14px !important;
     color: #333 !important;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Checkbox Styling */
-[data-baseweb="checkbox"] {
-    background-color: white !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Label Styling */
-label {
-    font-family: 'Roboto', sans-serif;
-    color: #333;
+    margin-bottom: 15px;
+    width: 100%;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 </style>
 """, unsafe_allow_html=True)
+
+
 
 
 
