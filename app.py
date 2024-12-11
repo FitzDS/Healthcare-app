@@ -490,27 +490,6 @@ except KeyError as e:
     # You can choose not to do anything here to continue execution
     pass
 
-# Sidebar with sorted list of locations
-st.sidebar.title("Nearby Locations")
-if not facilities.empty:
-    # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
-    facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
-
-    # Sort facilities by rating (descending)
-    sorted_facilities = facilities.sort_values(by="rating", ascending=False)
-
-    # Populate sidebar with sorted facilities
-    for _, row in sorted_facilities.iterrows():
-        st.sidebar.markdown(f"""
-        **{row['name']}**
-        - Address: {row['address']}
-        - Rating: {row['rating']} ⭐
-        - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
-        - Distance: {row.get('distance', 'N/A')} km
-        [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
-        """)
-else:
-    st.sidebar.warning("No facilities found nearby.")
 
 update_sidebar(st.session_state.facilities)
 
