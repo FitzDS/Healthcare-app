@@ -305,36 +305,36 @@ st.markdown("""
     border-radius: 15px; 
     padding: 20px; 
     background: linear-gradient(135deg, #ffffff, #f9f9f9); 
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
     margin-bottom: 20px;
     text-align: left;">
-    <h4 style="color: #2b2e4a; text-align: center; font-family: Arial, sans-serif; margin-bottom: 15px;">
+    <h4 style="color: #2b2e4a; text-align: center; font-family: 'Roboto', sans-serif; margin-bottom: 15px;">
         <strong>Map Legend</strong>
     </h4>
-    <ul style="list-style-type: none; padding: 0; font-family: Arial, sans-serif; font-size: 15px; color: #333; line-height: 1.8;">
+    <ul style="list-style-type: none; padding: 0; font-family: 'Roboto', sans-serif; font-size: 15px; color: #333; line-height: 1.8;">
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>Current Location</span>
+            Current Location
         </li>
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: green; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>4-5 Stars</span>
+            4-5 Stars
         </li>
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: blue; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>3-4 Stars</span>
+            3-4 Stars
         </li>
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: orange; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>2-3 Stars</span>
+            2-3 Stars
         </li>
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: yellow; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>1-2 Stars</span>
+            1-2 Stars
         </li>
         <li style="display: flex; align-items: center; margin: 10px 0;">
             <span style="width: 15px; height: 15px; background-color: gray; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            <span>Unrated or 0-1 Stars</span>
+            Unrated or 0-1 Stars
         </li>
     </ul>
 </div>
