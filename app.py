@@ -565,52 +565,43 @@ st.markdown("""
 <style>
 /* App Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Calm greenish background */
-    padding: 0;
+    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Subtle greenish background */
+    padding: 20px; /* Add padding to avoid cramped look */
     margin: 0;
 }
 
-/* Full-Height White Box */
-.full-box {
-    background-color: white;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    width: 90%;
-    max-width: 800px; /* Keep content centered and consistent */
-}
-
-/* Styled Title and Subtitle */
-.full-box h1, .full-box h2, .full-box p {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* Buttons */
-button[kind="primary"] {
-    background: linear-gradient(135deg, #43a047, #2e7d32);
-    color: white;
+/* Input Box Styling */
+input, select, textarea {
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
     font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 14px !important;
+    color: #333 !important;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-button[kind="primary"]:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Sliders */
+/* Slider Styling */
 [data-testid="stSlider"] {
     padding: 10px 0;
 }
+
+/* Title and Section Headers */
+h1, h2, h3 {
+    color: #2e7d32;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 20px;
+}
+
+/* Add Spacing Between Elements */
+.stSlider, .stButton {
+    margin: 20px 0 !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
