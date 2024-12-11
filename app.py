@@ -523,4 +523,65 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Background Styling */
+.header-container {
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    position: relative;
+    padding: 40px 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
 
+/* Header Text Styling */
+.header-container h1 {
+    color: #2c3e50;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.header-container p {
+    color: #7f8c8d;
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    text-align: left;
+    margin: 0;
+}
+
+/* Subtle Geometric Elements */
+.header-container::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 150px;
+    height: 150px;
+    background: rgba(0, 150, 136, 0.1);
+    border-radius: 50%;
+    transform: rotate(45deg);
+}
+
+.header-container::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: -40px;
+    width: 250px;
+    height: 250px;
+    background: rgba(76, 175, 80, 0.15);
+    border-radius: 50%;
+    transform: rotate(-30deg);
+}
+</style>
+
+<div class="header-container">
+    <h1>Global Healthcare Facility Locator</h1>
+    <p>Find the care you need, anywhere in the world.</p>
+</div>
+""", unsafe_allow_html=True)
