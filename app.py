@@ -558,3 +558,62 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
+
+
+st.markdown("""
+<style>
+/* Overall App Background */
+body {
+    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Calm greenish background */
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* White Content Box */
+.content-box {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 30px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+/* Style for Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stButton > button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Style for Sliders */
+.stSlider {
+    padding: 10px 0;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# White Box Container
+st.markdown('<div class="content-box">', unsafe_allow_html=True)
+
+# Add your sliders, buttons, and other elements here
+st.slider("Search Radius (km):", min_value=0, max_value=50, value=25)
+st.button("Search")
+
+# Close White Box Container
+st.markdown('</div>', unsafe_allow_html=True)
