@@ -232,22 +232,38 @@ def get_current_location():
     return [38.5449, -121.7405]
 
 st.markdown("""
-<div style="background-color:#4CAF50; padding:10px; border-radius:5px; text-align:center;">
-    <h1 style="color:white;">Global Healthcare Facility Locator</h1>
-    <p style="color:white;">Find the care you need, wherever you are.</p>
+<div style="background-color: #f7f7f7; padding: 20px; border-bottom: 3px solid #4CAF50; text-align: center;">
+    <h1 style="color: #333; font-family: 'Roboto', sans-serif; margin-bottom: 5px;">Global Healthcare Facility Locator</h1>
+    <p style="color: #666; font-family: 'Roboto', sans-serif; font-size: 18px;">Effortlessly locate healthcare services worldwide</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Add legend above the map
-st.markdown(f"""### Legend
-- **Red Marker**: Current Location
-- **Rating Colors**:
-  - **Green**: 4-5 Stars
-  - **Blue**: 3-4 Stars
-  - **Orange**: 2-3 Stars
-  - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
-""")
+st.markdown("""
+<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
+    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        <li style="margin: 5px 0;">
+            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
+        </li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
