@@ -298,15 +298,14 @@ if st.button("Search", key="search_button"):
 facilities = st.session_state["facilities"]
 
 # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-if show_medicaid_only:
-    if not facilities.empty:
-        # Check if the 'medicaid_supported' column exists before applying the filter
-        if 'medicaid_supported' in facilities.columns:
-            facilities = facilities[facilities["medicaid_supported"]]
-        else:
-            st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
-    else:
-        st.warning("No facilities found. Please search for healthcare facilities first.")
+try:
+    # Your code that may raise a KeyError
+    facilities = facilities[facilities["medicaid_supported"]]
+except KeyError as e:
+    # Handle the exception gracefully, without showing it to the user
+    print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
+    # You can choose not to do anything here to continue execution
+    pass
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
