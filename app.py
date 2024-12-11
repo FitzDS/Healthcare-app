@@ -232,31 +232,77 @@ def get_current_location():
     return [38.5449, -121.7405]
 
 st.markdown("""
-<div style="
-    background-color: #ffffff; 
-    padding: 40px; 
-    border-radius: 12px; 
-    border: 1px solid #ddd; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-    <h1 style="
-        color: #2c3e50; 
-        font-family: 'Roboto', sans-serif; 
-        font-weight: 700; 
-        font-size: 36px; 
-        text-align: left; 
-        margin-bottom: 10px;">
-        Global Healthcare Facility Locator
-    </h1>
-    <p style="
-        color: #7f8c8d; 
-        font-family: 'Roboto', sans-serif; 
-        font-size: 18px; 
-        text-align: left; 
-        margin: 0;">
-        Find the care you need, anywhere in the world.
-    </p>
+<style>
+/* Container Styling */
+.header-container {
+    background: linear-gradient(135deg, #6a1b9a, #283593, #0288d1, #26c6da);
+    background-size: 400% 400%; /* Animated gradient */
+    animation: gradientAnimation 15s ease infinite;
+    padding: 50px 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Text Styling */
+.header-container h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    font-size: 42px;
+    margin: 0;
+    text-shadow: 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-container p {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 20px;
+    margin: 10px 0 0 0;
+    letter-spacing: 0.5px;
+}
+
+/* Subtle Shapes */
+.header-container::before,
+.header-container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(75px);
+}
+
+.header-container::before {
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    top: -50px;
+    left: -50px;
+}
+
+.header-container::after {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.15);
+    bottom: -60px;
+    right: -60px;
+}
+
+/* Gradient Animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+</style>
+
+<div class="header-container">
+    <h1>Global Healthcare Facility Locator</h1>
+    <p>Find the care you need, wherever you are.</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 # Add legend above the map
 st.markdown("""
@@ -502,86 +548,3 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
-
-
-
-st.markdown("""
-<div style="text-align: center;">
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog" target="_blank" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
-        📝 Fill Out Feedback Form
-    </a>
-</div>
-""", unsafe_allow_html=True)
-
-
-st.markdown("""
-    <hr>
-    <div style="text-align:center; color:gray;">
-        <p>© 2024 Healthcare Facility Locator. All rights reserved.</p>
-        <p>Powered by Streamlit, Google Maps API, and OpenAI.</p>
-    </div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-/* Background Styling */
-.header-container {
-    background: linear-gradient(135deg, #e0f7fa, #ffffff);
-    position: relative;
-    padding: 40px 20px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
-    overflow: hidden;
-}
-
-/* Header Text Styling */
-.header-container h1 {
-    color: #2c3e50;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 700;
-    font-size: 36px;
-    text-align: left;
-    margin-bottom: 10px;
-}
-
-.header-container p {
-    color: #7f8c8d;
-    font-family: 'Roboto', sans-serif;
-    font-size: 18px;
-    text-align: left;
-    margin: 0;
-}
-
-/* Subtle Geometric Elements */
-.header-container::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    left: -50px;
-    width: 150px;
-    height: 150px;
-    background: rgba(0, 150, 136, 0.1);
-    border-radius: 50%;
-    transform: rotate(45deg);
-}
-
-.header-container::after {
-    content: '';
-    position: absolute;
-    bottom: -60px;
-    right: -40px;
-    width: 250px;
-    height: 250px;
-    background: rgba(76, 175, 80, 0.15);
-    border-radius: 50%;
-    transform: rotate(-30deg);
-}
-</style>
-
-<div class="header-container">
-    <h1>Global Healthcare Facility Locator</h1>
-    <p>Find the care you need, anywhere in the world.</p>
-</div>
-""", unsafe_allow_html=True)
