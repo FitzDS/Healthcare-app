@@ -6,6 +6,50 @@ from streamlit_folium import st_folium
 import folium
 from openai import Client
 
+
+st.markdown("""
+<style>
+/* Full page background */
+body {
+    background: linear-gradient(135deg, #2b2e4a, #4a5568);
+    padding: 0;
+    margin: 0;
+}
+
+/* Inner container for the white rectangle */
+.input-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 80%;
+    max-width: 800px;
+    margin: 30px auto; /* Centers the container */
+    text-align: left;
+}
+
+/* Heading styles inside the container */
+.input-container h3 {
+    color: #2b2e4a;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 20px;
+}
+
+/* Add padding to the Streamlit container */
+div[data-testid="stAppViewContainer"] {
+    padding: 20px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Create a container for the white input area
+st.markdown("""
+<div class="input-container">
+    <h3>Search for Healthcare Facilities</h3>
+</div>
+""", unsafe_allow_html=True)
+
 #sys.stderr = open(os.devnull, 'w')
 
 # Initialize session state for map, facilities, and search flag
@@ -567,42 +611,4 @@ else:
 
 
 
-
-
-st.markdown("""
-<style>
-/* Outer container with bold background */
-.page-container {
-    background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px 0;
-    height: 100%; /* Adjust height as needed */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Inner white rectangle for inputs */
-.input-container {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 30px;
-    width: 80%; /* Adjust width as needed */
-    max-width: 800px; /* Set max width for responsiveness */
-    text-align: left;
-}
-
-h3 {
-    color: #2b2e4a;
-    text-align: center;
-    margin-bottom: 20px;
-}
-</style>
-
-<div class="page-container">
-    <div class="input-container">
-        <h3>Search for Healthcare Facilities</h3>
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
