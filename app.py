@@ -316,30 +316,74 @@ st.markdown("""
 
 # Add legend above the map
 st.markdown("""
-<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
-    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
-    <ul style="list-style-type: none; padding: 0;">
-        <li style="margin: 5px 0;">
-            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
-        </li>
+<style>
+/* Legend Container */
+.legend-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 400px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Legend Title */
+.legend-container h3 {
+    margin-top: 0;
+    color: #2e7d32;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Legend List */
+.legend-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.legend-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.legend-list li span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+/* Legend Colors */
+.legend-red { background-color: red; }
+.legend-green { background-color: green; }
+.legend-blue { background-color: blue; }
+.legend-orange { background-color: orange; }
+.legend-yellow { background-color: yellow; }
+.legend-gray { background-color: gray; }
+</style>
+""", unsafe_allow_html=True)
+
+# HTML for the Legend
+st.markdown("""
+<div class="legend-container">
+    <h3>Map Legend</h3>
+    <ul class="legend-list">
+        <li><span class="legend-red"></span> <strong>Current Location</strong></li>
+        <li><span class="legend-green"></span> 4-5 Stars</li>
+        <li><span class="legend-blue"></span> 3-4 Stars</li>
+        <li><span class="legend-orange"></span> 2-3 Stars</li>
+        <li><span class="legend-yellow"></span> 1-2 Stars</li>
+        <li><span class="legend-gray"></span> Unrated or 0-1 Stars</li>
     </ul>
 </div>
 """, unsafe_allow_html=True)
+
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
