@@ -48,7 +48,7 @@ CARE_TYPES = {
 
 
 # Ensure the current location marker is persistent
-if "current_location_marker" .session_state:
+if "current_location_marker".session_state:
     st.session_state["current_location_marker"] = None
 
 facilities = fetch_healthcare_data_google(
@@ -290,7 +290,18 @@ elif location_query:
         longitude = lon
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
-
+if not st.session_state["search_clicked"]:
+    st.session_state["search_clicked"] = True
+    # Simulate a search action when the page is loaded for the first time
+    facilities = fetch_healthcare_data_google(
+        latitude=st.session_state["latitude"],
+        longitude=st.session_state["longitude"],
+        radius=20000,  # Default radius
+        care_type="hospital",  # Default care type (or leave it as "All Healthcare")
+        open_only=True,
+        medicaid_data=medicaid_data
+    )
+    st.session_state["facilities"] = facilities  # Store the result in session state
 
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
