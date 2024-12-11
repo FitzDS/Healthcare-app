@@ -566,14 +566,13 @@ else:
 
 st.markdown("""
 <style>
-/* Full-page background with geometric shapes */
-body {
+/* Apply gradient background to the full app */
+div[data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 0;
-    margin: 0;
+    padding: 50px;
 }
 
-/* Add a geometric shape */
+/* Add geometric shapes to the background */
 div[data-testid="stAppViewContainer"]::before {
     content: '';
     position: absolute;
@@ -600,18 +599,19 @@ div[data-testid="stAppViewContainer"]::after {
     filter: blur(75px);
 }
 
-/* White box styling for the content area */
+/* Widen and style the main content container */
 div[data-testid="stVerticalBlock"] {
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     padding: 40px;
-    max-width: 1000px; /* Wider box */
+    max-width: 1100px; /* Increase width */
     margin: auto;
     text-align: left;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
