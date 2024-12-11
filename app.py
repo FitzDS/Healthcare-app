@@ -300,23 +300,45 @@ st.markdown("""
 
 # Add legend above the map
 st.markdown("""
-<div class="legend-container">
-    <h3>Map Legend</h3>
-    <ul class="legend-list">
-        <li><span style="background-color: red;"></span> <strong>Current Location</strong></li>
-        <li><span style="background-color: green;"></span> 4-5 Stars</li>
-        <li><span style="background-color: blue;"></span> 3-4 Stars</li>
-        <li><span style="background-color: orange;"></span> 2-3 Stars</li>
-        <li><span style="background-color: yellow;"></span> 1-2 Stars</li>
-        <li><span style="background-color: gray;"></span> Unrated or 0-1 Stars</li>
+<div style="
+    border: 2px solid #ddd; 
+    border-radius: 12px; 
+    padding: 15px; 
+    background: linear-gradient(135deg, #f9f9f9, #e9e9e9); 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+    margin-top: 10px;">
+    <h3 style="color: #2b2e4a; text-align: center; font-family: Arial, sans-serif; margin-bottom: 15px;">
+        <strong>Map Legend</strong>
+    </h3>
+    <ul style="list-style-type: none; padding: 0; font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: red; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>Current Location</strong>
+        </li>
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: green; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>4-5 Stars</strong>
+        </li>
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: blue; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>3-4 Stars</strong>
+        </li>
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: orange; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>2-3 Stars</strong>
+        </li>
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: yellow; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>1-2 Stars</strong>
+        </li>
+        <li style="margin: 8px 0; display: flex; align-items: center;">
+            <span style="color: gray; font-weight: bold; font-size: 18px; margin-right: 10px;">⬤</span> 
+            <strong>Unrated or 0-1 Stars</strong>
+        </li>
     </ul>
 </div>
 """, unsafe_allow_html=True)
 
-
-st.markdown("""
-<div class="input-container">
-""", unsafe_allow_html=True)
 
 
 location_query = st.text_input("Search by Location:")
