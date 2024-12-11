@@ -560,6 +560,7 @@ else:
     st_folium(default_map, width=700, height=500)
 
 
+
 st.markdown("""
 <style>
 /* Overall App Background */
@@ -607,13 +608,3 @@ body {
 }
 </style>
 """, unsafe_allow_html=True)
-
-# White Box Container
-st.markdown('<div class="content-box">', unsafe_allow_html=True)
-
-# Add your sliders, buttons, and other elements here
-st.slider("Search Radius (km):", min_value=0, max_value=50, value=25)
-st.button("Search")
-
-# Close White Box Container
-st.markdown('</div>', unsafe_allow_html=True)
