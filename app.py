@@ -33,7 +33,7 @@ CARE_TYPES = {
 # Initialize session state for map and facilities
 if "map" not in st.session_state:
     st.session_state["map"] = None
-if "facilities" .session_state:
+if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 # Ensure the current location marker is persistent
