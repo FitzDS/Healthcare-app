@@ -328,14 +328,14 @@ facilities = st.session_state.get("facilities", pd.DataFrame())  # Safely retrie
 
 
     # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-    try:
-        # Your code that may raise a KeyError
-        facilities = facilities[facilities["medicaid_supported"]]
-    except KeyError as e:
-        # Handle the exception gracefully, without showing it to the user
-        print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
-        # You can choose not to do anything here to continue execution
-        pass
+try:
+    # Your code that may raise a KeyError
+    facilities = facilities[facilities["medicaid_supported"]]
+except KeyError as e:
+    # Handle the exception gracefully, without showing it to the user
+    print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
+    # You can choose not to do anything here to continue execution
+    pass
 
 # Sidebar with sorted list of locations
 st.sidebar.title("Nearby Locations")
