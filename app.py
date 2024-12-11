@@ -256,7 +256,7 @@ miles_to_meters = 1609.34      # Conversion factor from miles to meters
 if unit_option == "Meters":
     radius = st.slider("Search Radius:", min_value=500, max_value=100000, step=1000, value=20000, help="Radius in meters. Note: Only the 60 nearest facilities will be shown, as per API limitations.")
 else:
-    radius_in_miles = st.slider("Search Radius:", min_value=0.3, max_value=50, step=0.5, value=10, help="Radius in miles. Note: Only the 60 nearest facilities will be shown, as per API limitations.")
+    radius_in_miles = st.slider("Search Radius:", min_value=0.3, max_value=62.1, step=0.5, value=12.4, help="Radius in miles. Note: Only the 60 nearest facilities will be shown, as per API limitations.")
     radius = radius_in_miles * miles_to_meters  # Convert miles to meters
 
 # Display the selected radius
