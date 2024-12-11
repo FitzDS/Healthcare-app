@@ -326,15 +326,17 @@ if "facilities" not in st.session_state:
     st.session_state["facilities"] = pd.DataFrame()
 
 # Retrieve facilities from session state
-facilities = st.session_state["facilities"]
+facilities = st.session_state.get("facilities", pd.DataFrame())
 
-# Only apply the "Show Medicaid-Supported Providers Only" filter if the DataFrame has been populated
+# Only apply the "Show Medicaid-Supported Providers Only" filter if facilities have been loaded
 if show_medicaid_only:
+    # Check if the 'medicaid_supported' column exists and if facilities are not empty
     if not facilities.empty and "medicaid_supported" in facilities.columns:
-        # Filter Medicaid-supported facilities
         facilities = facilities[facilities["medicaid_supported"]]
-    else:
+    elif facilities.empty:
         st.warning("No facilities found. Please search for healthcare facilities first.")
+    else:
+        st.warning("Medicaid support column is missing. Please try searching for healthcare facilities.")
 
 
 # Check if facilities are empty to display map or error message
