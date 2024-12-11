@@ -230,33 +230,70 @@ def get_current_location():
         return g.latlng
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
-
 st.markdown("""
-<div style="text-align: center; padding: 40px 0;">
-    <h1 style="font-family: 'Roboto', sans-serif; color: #2e7d32; font-weight: bold; font-size: 36px;">
-        Global Healthcare Facility Locator
-    </h1>
-    <p style="font-family: 'Roboto', sans-serif; color: #666; font-size: 18px;">
-        Find the care you need, wherever you are.
-    </p>
+<style>
+/* Header Container */
+.header-container {
+    background-color: #2b2e4a;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+/* Geometric Shapes */
+.header-container::before,
+.header-container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(75px);
+    z-index: 0;
+}
+
+.header-container::before {
+    width: 300px;
+    height: 300px;
+    background: rgba(76, 175, 80, 0.1); /* Light green glow */
+    top: -50px;
+    left: -50px;
+}
+
+.header-container::after {
+    width: 350px;
+    height: 350px;
+    background: rgba(3, 169, 244, 0.15); /* Blue glow */
+    bottom: -60px;
+    right: -60px;
+}
+
+/* Title Styling */
+.header-container h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    font-size: 42px;
+    margin: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.header-container p {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 18px;
+    margin-top: 10px;
+    z-index: 1;
+    position: relative;
+}
+</style>
+
+<div class="header-container">
+    <h1>Global Healthcare Facility Locator</h1>
+    <p>Find the care you need, wherever you are.</p>
 </div>
 """, unsafe_allow_html=True)
-
-# Legend Section
-st.markdown('<div class="card-container legend-container">', unsafe_allow_html=True)
-st.markdown("""
-<h3 style="text-align: center; color: #2e7d32;">Map Legend</h3>
-<ul style="list-style: none; padding: 0; display: flex; justify-content: space-around;">
-    <li style="display: flex; align-items: center;"><span style="background-color: red; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> Current Location</li>
-    <li style="display: flex; align-items: center;"><span style="background-color: green; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 4-5 Stars</li>
-    <li style="display: flex; align-items: center;"><span style="background-color: blue; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 3-4 Stars</li>
-    <li style="display: flex; align-items: center;"><span style="background-color: orange; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 2-3 Stars</li>
-    <li style="display: flex; align-items: center;"><span style="background-color: yellow; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 1-2 Stars</li>
-    <li style="display: flex; align-items: center;"><span style="background-color: gray; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> Unrated or 0-1 Stars</li>
-</ul>
-""", unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
 
 
 
@@ -504,8 +541,6 @@ else:
     st_folium(default_map, width=700, height=500)
 
 
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 
 
