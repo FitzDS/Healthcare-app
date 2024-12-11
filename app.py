@@ -560,53 +560,62 @@ else:
 
 st.markdown("""
 <style>
-/* Page Background */
+/* Overall Page Background */
 [data-testid="stAppViewContainer"] {
-    background: #ffffff; /* Fallback for unsupported browsers */
-    background-image: url("https://www.transparenttextures.com/patterns/white-carbon.png"), 
-                      linear-gradient(135deg, #f5f7fa, #e3eff8);
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(135deg, #e8f5fe, #f5fafd); /* Light blue gradient */
+    padding: 20px;
+    overflow: auto; /* Fix scrolling issue */
 }
 
-/* Moving Geometric Shapes */
-.dynamic-bg {
+/* Add Static Geometric Shapes */
+.geometric-bg {
     position: absolute;
-    top: -50px;
-    left: -50px;
-    width: 150%;
-    height: 150%;
-    background: transparent;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('X1MDOTYwNjI4NTcEX3IDMgRmcgNtY2FmZWUEZnIyA3A6cyx2OmksbTpzYi10b3AEZ3ByaWQDZ2ZfclAyelBUNFc3djhKX2g3UXpuQQRuX3JzbHQDMARuX3N1Z2cDMARvcmlnaW4DaW1hZ2VzLnNlYXJjaC55YWhvby5jb20EcG9zAzAEcHFzdHIDBHBxc3RybAMwBHFzdHJsAzUxBHF1ZXJ5AyUyMmNyZWF0aXZlJTIwY29tbW9ucyUyMiUyMG1vZGVybiUyMGdlb21ldHJ5JTIwYmFja2dyb3VuZCUyMGdyZWVuBHRfc3RtcAMxNzMzOTA2ODgw'); /* Replace with any static pattern */
+    opacity: 0.15; /* Light and non-distracting */
     z-index: -1;
-    animation: moveShapes 10s linear infinite;
-    opacity: 0.4;
-    background: repeating-linear-gradient(
-        45deg,
-        #c6e4f2,
-        #c6e4f2 10px,
-        #e3f5fe 10px,
-        #e3f5fe 20px
-    );
-    mask-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Polygon_pattern.svg/2560px-Polygon_pattern.svg.png");
-    mask-size: cover;
-}
-
-/* Animation for Dynamic Effect */
-@keyframes moveShapes {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(10px, 10px) rotate(5deg); }
-    100% { transform: translate(0, 0) rotate(0deg); }
 }
 
 /* Content Box Styling */
 .card-container {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: white;
     border-radius: 12px;
     padding: 20px 30px;
     box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
     max-width: 800px;
     font-family: 'Roboto', sans-serif;
+}
+
+/* Section Titles */
+.card-container h3 {
+    color: #2e7d32;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Inputs and Buttons */
+input, select, textarea, button {
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+button[kind="primary"] {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[kind="primary"]:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
 """, unsafe_allow_html=True)
