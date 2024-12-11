@@ -556,41 +556,65 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
 <style>
-/* Input Section Container */
-.input-container {
+/* Legend Container */
+.legend-container {
     background-color: white;
     border-radius: 12px;
-    padding: 30px;
+    padding: 20px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    max-width: 800px;
+    max-width: 600px; /* Wider for alignment with header */
     font-family: 'Roboto', sans-serif;
+    text-align: center; /* Center-align content */
 }
 
-/* Section Titles */
-.input-container h3 {
+/* Legend Title */
+.legend-container h3 {
     margin-top: 0;
     color: #2e7d32;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
-    text-align: center;
 }
 
-/* Inputs Styling */
-input, select, textarea {
-    background-color: #f9f9f9 !important;
-    border: 1px solid #ccc !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px !important;
-    color: #333 !important;
-    margin-bottom: 15px;
-    width: 100%;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+/* Legend List */
+.legend-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: flex; /* Align items horizontally */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: space-around; /* Equal spacing between items */
+}
+
+.legend-list li {
+    display: flex;
+    align-items: center;
+    margin: 10px 15px; /* Adjust spacing for compactness */
+    font-size: 14px;
+    color: #333;
+}
+
+.legend-list li span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 50%;
 }
 </style>
+
+<div class="legend-container">
+    <h3>Map Legend</h3>
+    <ul class="legend-list">
+        <li><span style="background-color: red;"></span> <strong>Current Location</strong></li>
+        <li><span style="background-color: green;"></span> 4-5 Stars</li>
+        <li><span style="background-color: blue;"></span> 3-4 Stars</li>
+        <li><span style="background-color: orange;"></span> 2-3 Stars</li>
+        <li><span style="background-color: yellow;"></span> 1-2 Stars</li>
+        <li><span style="background-color: gray;"></span> Unrated or 0-1 Stars</li>
+    </ul>
+</div>
 """, unsafe_allow_html=True)
 
 
