@@ -232,9 +232,27 @@ def get_current_location():
     return [38.5449, -121.7405]
 
 st.markdown("""
-<div style="background-color: #f7f7f7; padding: 20px; border-bottom: 3px solid #4CAF50; text-align: center;">
-    <h1 style="color: #333; font-family: 'Roboto', sans-serif; margin-bottom: 5px;">Global Healthcare Facility Locator</h1>
-    <p style="color: #666; font-family: 'Roboto', sans-serif; font-size: 18px;">Effortlessly locate healthcare services worldwide</p>
+<div style="
+    background-color: #ffffff; 
+    padding: 30px; 
+    border-bottom: 2px solid #4CAF50; 
+    text-align: center; 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <h1 style="
+        color: #2c3e50; 
+        font-family: 'Helvetica', sans-serif; 
+        font-weight: bold; 
+        font-size: 36px; 
+        margin-bottom: 10px;">
+        Global Healthcare Facility Locator
+    </h1>
+    <p style="
+        color: #7f8c8d; 
+        font-family: 'Helvetica', sans-serif; 
+        font-size: 18px; 
+        margin: 0;">
+        Find the care you need, anywhere in the world
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
