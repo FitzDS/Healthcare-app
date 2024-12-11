@@ -245,6 +245,28 @@ st.markdown(f"""### Legend
 """)
 
 location_query = st.text_input("Search by Location:")
+# Add a toggle for units
+unit_option = st.radio("Select Unit for Radius:", options=["Meters", "Miles"], index=0)
+
+# Set conversion factor
+meters_to_miles = 0.000621371  # Conversion factor from meters to miles
+miles_to_meters = 1609.34      # Conversion factor from miles to meters
+
+# Adjust the radius input based on the selected unit
+if unit_option == "Meters":
+    radius = st.slider("Search Radius:", min_value=500, max_value=100000, step=1000, value=20000, help="Radius in meters. Note: Only the 60 nearest facilities will be shown, as per API limitations.")
+else:
+    radius_in_miles = st.slider("Search Radius:", min_value=0.3, max_value=62.1, step=0.5, value=12.4, help="Radius in miles. Note: Only the 60 nearest facilities will be shown, as per API limitations.")
+    radius = radius_in_miles * miles_to_meters  # Convert miles to meters
+
+# Display the selected radius
+if unit_option == "Meters":
+    st.write(f"Selected Radius: {radius} meters")
+else:
+    st.write(f"Selected Radius: {radius / miles_to_meters:.2f} miles")
+
+# Use the `radius` variable (always in meters) in the rest of the app
+
 radius = st.slider("Search Radius (meters):", min_value=500, max_value=100000, step=1000, value=20000, help="Note: Only the 60 nearest facilities will be shown, as per API limitations.")
 issue_description = st.text_area("Describe the issue (optional):")
 care_type = st.selectbox("Type of Care (leave blank to auto-detect):", options=[""] + list(CARE_TYPES.keys()))
