@@ -234,24 +234,25 @@ def get_current_location():
 st.markdown("""
 <div style="
     background-color: #ffffff; 
-    padding: 30px; 
-    border-bottom: 2px solid #4CAF50; 
+    padding: 40px; 
+    border-radius: 12px; 
+    border: 1px solid #ddd; 
     text-align: center; 
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
     <h1 style="
         color: #2c3e50; 
-        font-family: 'Helvetica', sans-serif; 
-        font-weight: bold; 
+        font-family: 'Roboto', sans-serif; 
+        font-weight: 700; 
         font-size: 36px; 
         margin-bottom: 10px;">
         Global Healthcare Facility Locator
     </h1>
     <p style="
         color: #7f8c8d; 
-        font-family: 'Helvetica', sans-serif; 
+        font-family: 'Roboto', sans-serif; 
         font-size: 18px; 
         margin: 0;">
-        Find the care you need, anywhere in the world
+        Find the care you need, anywhere in the world.
     </p>
 </div>
 """, unsafe_allow_html=True)
