@@ -291,6 +291,7 @@ elif location_query:
         st.write(f"Using location: {location_query} (Latitude: {latitude}, Longitude: {longitude})")
 
 def perform_search():
+    st.write("hello")
     st.write("Fetching data...")
 
     # Fetch facilities using Google API
