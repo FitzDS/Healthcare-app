@@ -288,6 +288,9 @@ if st.button("Search", key="search_button"):
         medicaid_data=medicaid_data 
     )
 
+        
+    # Store the fetched facilities in session state
+    st.session_state["facilities"] = facilities
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
     if show_medicaid_only:
@@ -295,9 +298,6 @@ if st.button("Search", key="search_button"):
             facilities = facilities[facilities['medicaid_supported']]
         else:
             st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
-        
-    # Store the fetched facilities in session state
-    st.session_state["facilities"] = facilities
 
 
 # Sidebar with sorted list of locations
