@@ -464,11 +464,7 @@ if st.button("Search", key="search_button"):
         open_only=open_only,
         medicaid_data=medicaid_data
     )
-
-    if facilities is not None and not facilities.empty:
-        update_sidebar(facilities)
-    else:
-        st.sidebar.warning("No facilities found for the given search.")
+   
 
     # Only apply the "Show Medicaid-Supported Providers Only" filter if enabled
     if show_medicaid_only and "medicaid_supported" in facilities.columns:
@@ -515,6 +511,8 @@ if not facilities.empty:
         """)
 else:
     st.sidebar.warning("No facilities found nearby.")
+
+update_sidebar(st.session_state.facilities)
 
 
 
