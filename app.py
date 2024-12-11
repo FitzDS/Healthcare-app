@@ -566,20 +566,49 @@ else:
 
 st.markdown("""
 <style>
-/* Full app background gradient */
-div[data-testid="stAppViewContainer"] {
+/* Full-page background with geometric shapes */
+body {
     background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px; /* Adds padding around the app content */
+    padding: 0;
+    margin: 0;
 }
 
-/* White rectangle for content area */
+/* Add a geometric shape */
+div[data-testid="stAppViewContainer"]::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: -150px;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(75px);
+}
+
+div[data-testid="stAppViewContainer"]::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    right: -150px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(75px);
+}
+
+/* White box styling for the content area */
 div[data-testid="stVerticalBlock"] {
     background-color: white;
-    border-radius: 15px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 30px;
-    max-width: 800px;
-    margin: auto; /* Center the content area */
+    border-radius: 20px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 1000px; /* Wider box */
+    margin: auto;
+    text-align: left;
 }
 </style>
 """, unsafe_allow_html=True)
