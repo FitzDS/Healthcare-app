@@ -301,20 +301,22 @@ st.markdown("""
 <style>
 .legend-container {
     border: 1px solid #ddd;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 20px;
     background-color: #ffffff;
     margin-top: 20px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: left; /* Align text to the left */
 }
 
 .legend-container h3 {
     color: #2b2e4a;
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 20px; /* Slightly smaller for better balance */
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd; /* Underline the title */
+    padding-bottom: 5px;
 }
 
 .legend-container ul {
@@ -324,12 +326,17 @@ st.markdown("""
 }
 
 .legend-container li {
-    margin: 15px 0;
+    margin: 10px 0;
     font-family: 'Roboto', sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    border-bottom: 1px solid #eee; /* Subtle separator between items */
+    padding-bottom: 8px;
+}
+
+.legend-container li:last-child {
+    border-bottom: none; /* Remove the last item's separator */
 }
 
 .legend-container li span {
@@ -338,6 +345,7 @@ st.markdown("""
     height: 16px;
     border-radius: 50%;
     margin-right: 10px;
+    border: 1px solid #ddd; /* Add a subtle border to the markers */
 }
 
 .color-red { background-color: #ff6b6b; } /* Soft Red */
