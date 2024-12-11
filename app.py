@@ -299,10 +299,11 @@ facilities = st.session_state["facilities"]
 
 if show_medicaid_only:
     if not facilities.empty:
-        if "medicaid_supported" in facilities.columns:
-            # Apply the filter only if the column exists
+        try:
+            # Try to filter using 'medicaid_supported' column
             facilities = facilities[facilities["medicaid_supported"]]
-        else:
+        except KeyError:
+            # If the 'medicaid_supported' column is missing, simply ignore the error and show a warning
             st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
     else:
         st.warning("No facilities found. Please search for healthcare facilities first.")
