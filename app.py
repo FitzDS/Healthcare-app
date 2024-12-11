@@ -278,6 +278,17 @@ if st.button("Search", key="search_button"):
     if "facilities" not in st.session_state:
         st.session_state["facilities"] = pd.DataFrame()  # Empty DataFrame initially
 
+
+    # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
+    if show_medicaid_only:
+        try:
+            if "medicaid_supported" in facilities.columns:
+                facilities = facilities[facilities["medicaid_supported"]]
+            else:
+                st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
+        except KeyError as e:
+            st.warning(f"KeyError: {e} - 'medicaid_supported' column not found. The filter is being ignored.")
+    
     st.write("Fetching data...")
 
     # Fetch facilities using Google API
@@ -290,15 +301,6 @@ if st.button("Search", key="search_button"):
         medicaid_data=medicaid_data
     )
 
-    # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-    if show_medicaid_only:
-        try:
-            if "medicaid_supported" in facilities.columns:
-                facilities = facilities[facilities["medicaid_supported"]]
-            else:
-                st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
-        except KeyError as e:
-            st.warning(f"KeyError: {e} - 'medicaid_supported' column not found. The filter is being ignored.")
     
     # Apply wheelchair filter if needed
     if filter_wheelchair_accessible:
