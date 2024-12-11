@@ -232,83 +232,30 @@ def get_current_location():
     return [38.5449, -121.7405]
 
 st.markdown("""
-<style>
-/* Header Container */
-.header-container {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Green gradient */
-    padding: 60px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-    color: white;
-}
-
-/* Geometric Shapes */
-.shape-1 {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: #43a047; /* Green shape */
-    top: 20px;
-    left: 20px;
-    transform: rotate(45deg);
-    z-index: 0;
-    box-shadow: 0px 0px 20px 10px rgba(67, 160, 71, 0.6); /* Glow effect */
-}
-
-.shape-2 {
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    background: #2e7d32; /* Dark green shape */
-    bottom: 30px;
-    right: 40px;
-    transform: rotate(-45deg);
-    z-index: 0;
-    box-shadow: 0px 0px 25px 15px rgba(46, 125, 50, 0.5); /* Glow effect */
-}
-
-.shape-3 {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: #81c784; /* Light green shape */
-    top: 100px;
-    right: 100px;
-    transform: rotate(30deg);
-    z-index: 0;
-    box-shadow: 0px 0px 15px 8px rgba(129, 199, 132, 0.7); /* Glow effect */
-}
-
-/* Title Styling */
-.header-container h1 {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 900;
-    font-size: 42px;
-    margin: 0;
-    position: relative;
-    z-index: 1;
-}
-
-.header-container p {
-    font-family: 'Roboto', sans-serif';
-    font-weight: 300;
-    font-size: 18px;
-    margin-top: 10px;
-    position: relative;
-    z-index: 1;
-}
-</style>
-
-<div class="header-container">
-    <div class="shape-1"></div>
-    <div class="shape-2"></div>
-    <div class="shape-3"></div>
-    <h1>Global Healthcare Facility Locator</h1>
-    <p>Find the care you need, wherever you are.</p>
+<div style="text-align: center; padding: 40px 0;">
+    <h1 style="font-family: 'Roboto', sans-serif; color: #2e7d32; font-weight: bold; font-size: 36px;">
+        Global Healthcare Facility Locator
+    </h1>
+    <p style="font-family: 'Roboto', sans-serif; color: #666; font-size: 18px;">
+        Find the care you need, wherever you are.
+    </p>
 </div>
 """, unsafe_allow_html=True)
+
+# Legend Section
+st.markdown('<div class="card-container legend-container">', unsafe_allow_html=True)
+st.markdown("""
+<h3 style="text-align: center; color: #2e7d32;">Map Legend</h3>
+<ul style="list-style: none; padding: 0; display: flex; justify-content: space-around;">
+    <li style="display: flex; align-items: center;"><span style="background-color: red; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> Current Location</li>
+    <li style="display: flex; align-items: center;"><span style="background-color: green; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 4-5 Stars</li>
+    <li style="display: flex; align-items: center;"><span style="background-color: blue; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 3-4 Stars</li>
+    <li style="display: flex; align-items: center;"><span style="background-color: orange; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 2-3 Stars</li>
+    <li style="display: flex; align-items: center;"><span style="background-color: yellow; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> 1-2 Stars</li>
+    <li style="display: flex; align-items: center;"><span style="background-color: gray; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px;"></span> Unrated or 0-1 Stars</li>
+</ul>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 
@@ -558,70 +505,7 @@ else:
 
 
 
-st.markdown("""
-<style>
-/* Overall Page Background */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #e8f5fe, #f5fafd); /* Light blue gradient */
-    padding: 20px;
-    overflow: auto; /* Fix scrolling issue */
-}
-
-/* Add Static Geometric Shapes */
-.geometric-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('X1MDOTYwNjI4NTcEX3IDMgRmcgNtY2FmZWUEZnIyA3A6cyx2OmksbTpzYi10b3AEZ3ByaWQDZ2ZfclAyelBUNFc3djhKX2g3UXpuQQRuX3JzbHQDMARuX3N1Z2cDMARvcmlnaW4DaW1hZ2VzLnNlYXJjaC55YWhvby5jb20EcG9zAzAEcHFzdHIDBHBxc3RybAMwBHFzdHJsAzUxBHF1ZXJ5AyUyMmNyZWF0aXZlJTIwY29tbW9ucyUyMiUyMG1vZGVybiUyMGdlb21ldHJ5JTIwYmFja2dyb3VuZCUyMGdyZWVuBHRfc3RtcAMxNzMzOTA2ODgw'); /* Replace with any static pattern */
-    opacity: 0.15; /* Light and non-distracting */
-    z-index: -1;
-}
-
-/* Content Box Styling */
-.card-container {
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px 30px;
-    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    max-width: 800px;
-    font-family: 'Roboto', sans-serif;
-}
-
-/* Section Titles */
-.card-container h3 {
-    color: #2e7d32;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-/* Inputs and Buttons */
-input, select, textarea, button {
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
-}
-
-button[kind="primary"] {
-    background: linear-gradient(135deg, #43a047, #2e7d32);
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-button[kind="primary"]:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 
