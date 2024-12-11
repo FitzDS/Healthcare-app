@@ -558,6 +558,69 @@ else:
 
 
 
+st.markdown("""
+<style>
+/* Page Background */
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Matching green gradient */
+    padding: 20px; /* Add padding to avoid cramped content */
+}
+
+/* Input and Legend Boxes */
+.input-container, .legend-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px 30px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    margin: 20px auto;
+    width: 90%;
+    max-width: 800px; /* Consistent max width */
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Section Titles */
+.input-container h3, .legend-container h3 {
+    margin-top: 0;
+    color: #2e7d32; /* Title box green */
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Inputs Styling */
+input, select, textarea {
+    background-color: #f9f9f9 !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px !important;
+    color: #333 !important;
+    margin-bottom: 15px;
+    width: 100%;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons Styling */
+button[kind="primary"] {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[kind="primary"]:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 
