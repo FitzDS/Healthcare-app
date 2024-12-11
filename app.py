@@ -330,7 +330,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
+st.markdown("""
+<div class="input-container">
+""", unsafe_allow_html=True)
+
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
@@ -395,6 +398,9 @@ elif location_query:
 # After the search has been performed, retrieve the facilities and display them
 facilities = st.session_state.get("facilities", pd.DataFrame())
 
+st.markdown("""
+</div>
+""", unsafe_allow_html=True)
 
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
@@ -550,56 +556,7 @@ else:
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
 
-st.markdown('</div>', unsafe_allow_html=True)
 
-
-
-.input-container {
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    width: 90%;
-    max-width: 800px;
-    font-family: 'Roboto', sans-serif;
-}
-
-input, select, textarea {
-    background-color: #f9f9f9 !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px !important;
-    color: #333 !important;
-    margin-bottom: 15px;
-    width: 100%;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.stSlider {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    padding: 10px 0;
-}
-
-button[kind="primary"] {
-    background: linear-gradient(135deg, #43a047, #2e7d32);
-    color: white;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-button[kind="primary"]:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-}
 
 
 
