@@ -251,8 +251,8 @@ st.markdown("""
     position: absolute;
     border-radius: 50%;
     filter: blur(75px);
-    animation: moveBlur 12s infinite alternate;
     z-index: 0;
+    animation: moveBlur 12s ease-in-out infinite;
 }
 
 .header-container::before {
@@ -261,7 +261,7 @@ st.markdown("""
     background: rgba(76, 175, 80, 0.15); /* Soft green */
     top: -50px;
     left: -50px;
-    animation-delay: 0s; /* Green glow moves first */
+    animation-delay: 0s; /* Green glow starts immediately */
 }
 
 .header-container::after {
@@ -270,7 +270,14 @@ st.markdown("""
     background: rgba(3, 169, 244, 0.2); /* Soft blue */
     bottom: -60px;
     right: -60px;
-    animation-delay: 6s; /* Blue glow moves next */
+    animation-delay: 6s; /* Blue glow starts after 6 seconds */
+}
+
+/* Animation Keyframes */
+@keyframes moveBlur {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -30px); }
+    100% { transform: translate(-20px, 20px); }
 }
 
 /* Title Styling */
@@ -290,13 +297,6 @@ st.markdown("""
     margin-top: 10px;
     z-index: 1;
     position: relative;
-}
-
-/* Animation Keyframes */
-@keyframes moveBlur {
-    0% { transform: translate(0, 0); }
-    50% { transform: translate(20px, -20px); }
-    100% { transform: translate(-10px, 10px); }
 }
 </style>
 
