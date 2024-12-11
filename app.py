@@ -244,38 +244,41 @@ st.markdown("""
     color: white;
 }
 
-/* Glowing Geometric Shapes */
+/* Geometric Shapes */
 .shape-1 {
     position: absolute;
-    width: 150px;
-    height: 150px;
-    background: rgba(76, 175, 80, 0.8); /* Bright green */
-    filter: blur(100px);
-    top: -30px;
-    left: 30px;
-    opacity: 0.7;
+    width: 120px;
+    height: 120px;
+    background: #43a047; /* Green shape */
+    top: 20px;
+    left: 20px;
+    transform: rotate(45deg);
+    z-index: 0;
+    box-shadow: 0px 0px 20px 10px rgba(67, 160, 71, 0.6); /* Glow effect */
 }
 
 .shape-2 {
     position: absolute;
-    width: 200px;
-    height: 200px;
-    background: rgba(56, 142, 60, 0.6); /* Mid-tone green */
-    filter: blur(150px);
-    bottom: -40px;
-    right: 50px;
-    opacity: 0.6;
+    width: 160px;
+    height: 160px;
+    background: #2e7d32; /* Dark green shape */
+    bottom: 30px;
+    right: 40px;
+    transform: rotate(-45deg);
+    z-index: 0;
+    box-shadow: 0px 0px 25px 15px rgba(46, 125, 50, 0.5); /* Glow effect */
 }
 
 .shape-3 {
     position: absolute;
-    width: 250px;
-    height: 250px;
-    background: rgba(27, 94, 32, 0.5); /* Darker green */
-    filter: blur(200px);
-    top: 50px;
-    right: -60px;
-    opacity: 0.5;
+    width: 100px;
+    height: 100px;
+    background: #81c784; /* Light green shape */
+    top: 100px;
+    right: 100px;
+    transform: rotate(30deg);
+    z-index: 0;
+    box-shadow: 0px 0px 15px 8px rgba(129, 199, 132, 0.7); /* Glow effect */
 }
 
 /* Title Styling */
@@ -306,6 +309,7 @@ st.markdown("""
     <p>Find the care you need, wherever you are.</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
