@@ -321,6 +321,21 @@ if not facilities.empty:
 else:
     st.sidebar.warning("No facilities found nearby.")
 
+if "facilities" not in st.session_state:
+    st.session_state["facilities"] = pd.DataFrame()
+
+# Retrieve facilities from session state
+facilities = st.session_state["facilities"]
+
+# Check if the "Show Medicaid-Supported Providers Only" checkbox is selected
+if show_medicaid_only:
+    # Only apply the filter if facilities are loaded
+    if not facilities.empty:
+        facilities = facilities[facilities["medicaid_supported"]]
+    else:
+        st.warning("No facilities found. Please search for healthcare facilities first.")
+
+
 # Check if facilities are empty to display map or error message
 if facilities.empty:
     st.error("No facilities found. Check your API key, location, or radius.")
