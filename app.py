@@ -244,37 +244,37 @@ st.markdown("""
     color: white;
 }
 
-/* Geometric Shapes */
+/* Glowing Geometric Shapes */
 .shape-1 {
     position: absolute;
-    width: 100px;
-    height: 100px;
-    background: rgba(76, 175, 80, 0.7); /* Bright green */
-    top: -20px;
-    left: 10px;
-    transform: rotate(45deg);
-    opacity: 0.8;
+    width: 150px;
+    height: 150px;
+    background: rgba(76, 175, 80, 0.8); /* Bright green */
+    filter: blur(100px);
+    top: -30px;
+    left: 30px;
+    opacity: 0.7;
 }
 
 .shape-2 {
     position: absolute;
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     background: rgba(56, 142, 60, 0.6); /* Mid-tone green */
-    bottom: -30px;
-    right: 30px;
-    transform: rotate(-45deg);
+    filter: blur(150px);
+    bottom: -40px;
+    right: 50px;
     opacity: 0.6;
 }
 
 .shape-3 {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     background: rgba(27, 94, 32, 0.5); /* Darker green */
+    filter: blur(200px);
     top: 50px;
-    right: -50px;
-    transform: rotate(30deg);
+    right: -60px;
     opacity: 0.5;
 }
 
@@ -289,7 +289,7 @@ st.markdown("""
 }
 
 .header-container p {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif';
     font-weight: 300;
     font-size: 18px;
     margin-top: 10px;
