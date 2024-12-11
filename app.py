@@ -235,8 +235,8 @@ st.markdown("""
 <style>
 /* Header Container */
 .header-container {
-    background-color: #2b2e4a; /* Dark blue-gray background */
-    padding: 50px;
+    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Green gradient */
+    padding: 60px;
     border-radius: 12px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -244,30 +244,38 @@ st.markdown("""
     color: white;
 }
 
-/* Static Geometric Shapes */
-.header-container::before,
-.header-container::after {
-    content: '';
+/* Geometric Shapes */
+.shape-1 {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(75px);
-    z-index: 0;
+    width: 100px;
+    height: 100px;
+    background: rgba(76, 175, 80, 0.7); /* Bright green */
+    top: -20px;
+    left: 10px;
+    transform: rotate(45deg);
+    opacity: 0.8;
 }
 
-.header-container::before {
-    width: 300px;
-    height: 300px;
-    background: rgba(76, 175, 80, 0.15); /* Soft green */
-    top: -50px;
-    left: -50px;
+.shape-2 {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: rgba(56, 142, 60, 0.6); /* Mid-tone green */
+    bottom: -30px;
+    right: 30px;
+    transform: rotate(-45deg);
+    opacity: 0.6;
 }
 
-.header-container::after {
-    width: 350px;
-    height: 350px;
-    background: rgba(3, 169, 244, 0.2); /* Soft blue */
-    bottom: -60px;
-    right: -60px;
+.shape-3 {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: rgba(27, 94, 32, 0.5); /* Darker green */
+    top: 50px;
+    right: -50px;
+    transform: rotate(30deg);
+    opacity: 0.5;
 }
 
 /* Title Styling */
@@ -276,25 +284,29 @@ st.markdown("""
     font-weight: 900;
     font-size: 42px;
     margin: 0;
-    z-index: 1;
     position: relative;
+    z-index: 1;
 }
 
 .header-container p {
-    font-family: 'Roboto', sans-serif';
+    font-family: 'Roboto', sans-serif;
     font-weight: 300;
     font-size: 18px;
     margin-top: 10px;
-    z-index: 1;
     position: relative;
+    z-index: 1;
 }
 </style>
 
 <div class="header-container">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+    <div class="shape-3"></div>
     <h1>Global Healthcare Facility Locator</h1>
     <p>Find the care you need, wherever you are.</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
