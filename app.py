@@ -569,5 +569,40 @@ else:
 
 
 
+st.markdown("""
+<style>
+/* Outer container with bold background */
+.page-container {
+    background: linear-gradient(135deg, #2b2e4a, #4a5568);
+    padding: 50px 0;
+    height: 100%; /* Adjust height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+/* Inner white rectangle for inputs */
+.input-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 80%; /* Adjust width as needed */
+    max-width: 800px; /* Set max width for responsiveness */
+    text-align: left;
+}
+
+h3 {
+    color: #2b2e4a;
+    text-align: center;
+    margin-bottom: 20px;
+}
+</style>
+
+<div class="page-container">
+    <div class="input-container">
+        <h3>Search for Healthcare Facilities</h3>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
