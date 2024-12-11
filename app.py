@@ -280,14 +280,7 @@ if st.button("Search", key="search_button"):
 
 
     # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-    if show_medicaid_only:
-        try:
-            if "medicaid_supported" in facilities.columns:
-                facilities = facilities[facilities["medicaid_supported"]]
-            else:
-                st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
-        except KeyError as e:
-            st.warning(f"KeyError: {e} - 'medicaid_supported' column not found. The filter is being ignored.")
+    
     
     st.write("Fetching data...")
 
@@ -301,139 +294,146 @@ if st.button("Search", key="search_button"):
         medicaid_data=medicaid_data
     )
 
-    
+    if show_medicaid_only:
+        try:
+            if "medicaid_supported" in facilities.columns:
+                facilities = facilities[facilities["medicaid_supported"]]
+            else:
+                st.warning("The 'medicaid_supported' column is missing. Please search for healthcare facilities first.")
+        except KeyError as e:
+            st.warning(f"KeyError: {e} - 'medicaid_supported' column not found. The filter is being ignored.")
     # Apply wheelchair filter if needed
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
-
+    
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
 
-# Retrieve facilities from session state
-facilities = st.session_state.get("facilities", pd.DataFrame())  # Safely retrieve facilities from session state
-
-
-    # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
-    try:
-        # Your code that may raise a KeyError
-        facilities = facilities[facilities["medicaid_supported"]]
-    except KeyError as e:
-        # Handle the exception gracefully, without showing it to the user
-        print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
-        # You can choose not to do anything here to continue execution
-        pass
-
-# Sidebar with sorted list of locations
-st.sidebar.title("Nearby Locations")
-if not facilities.empty:
-    # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
-    facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
-
-    # Sort facilities by rating (descending)
-    sorted_facilities = facilities.sort_values(by="rating", ascending=False)
-
-    # Populate sidebar with sorted facilities
-    for _, row in sorted_facilities.iterrows():
-        st.sidebar.markdown(f"""
-        **{row['name']}**
-        - Address: {row['address']}
-        - Rating: {row['rating']} ⭐
-        - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
-        - Distance: {row.get('distance', 'N/A')} km
-        [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
-        """)
-else:
-    st.sidebar.warning("No facilities found nearby.")
-
-# Ensure facilities are stored in session state
-# Ensure facilities are stored in session state
-if "facilities" not in st.session_state:
-    st.session_state["facilities"] = pd.DataFrame()
-
-# Retrieve facilities from session state
-facilities = st.session_state["facilities"]
-
-
-# Check if facilities are empty to display map or error message
-if facilities.empty:
-    st.error("No facilities found. Check your location or radius.")
-    st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
-else:
-    st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
-    m = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(m)
-
-    for _, row in facilities.iterrows():
-        wheelchair_accessible = row.get('wheelchair_accessible_entrance', False)
-        # Assign a color based on ratings
-        color = "gray"  # Default color for unrated
-        if row["rating"] != "No rating" and row["rating"]:
-            if float(row["rating"]) >= 4:
-                color = "green"
-            elif float(row["rating"]) >= 3:
-                color = "blue"
-            elif float(row["rating"]) >= 2:
-                color = "orange"
-            elif float(row["rating"]) >= 1:
-                color = "yellow"
-
-        # Generate the directions link
-        directions_link = f"https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}"
-
-        # Add marker with "Get Directions" link
-        popup_content = f"""
-        <b>{row['name']}</b><br>
-        Address: {row['address']}<br>
-        Open Now: {"Open" if row['open_now'] else "Closed"}<br>
-        Medicaid Supported: {"Yes" if row["medicaid_supported"] else "No"}<br>
-        Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
-        Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}<br>
-        <a href="{directions_link}" target="_blank">Get Directions</a>
-        """
-        folium.Marker(
-            location=[row["latitude"], row["longitude"]],
-            popup=folium.Popup(popup_content, max_width=300),
-            icon=folium.Icon(color=color)
+    # Retrieve facilities from session state
+    facilities = st.session_state.get("facilities", pd.DataFrame())  # Safely retrieve facilities from session state
+    
+    
+        # Only apply the "Show Medicaid-Supported Providers Only" filter if facilities are populated
+        try:
+            # Your code that may raise a KeyError
+            facilities = facilities[facilities["medicaid_supported"]]
+        except KeyError as e:
+            # Handle the exception gracefully, without showing it to the user
+            print(f"KeyError: {e} - This column doesn't exist, but it's being ignored.")  # Log for debugging
+            # You can choose not to do anything here to continue execution
+            pass
+    
+    # Sidebar with sorted list of locations
+    st.sidebar.title("Nearby Locations")
+    if not facilities.empty:
+        # Ensure 'rating' is numeric, replacing non-numeric or missing values with 0
+        facilities['rating'] = pd.to_numeric(facilities['rating'], errors='coerce').fillna(0)
+    
+        # Sort facilities by rating (descending)
+        sorted_facilities = facilities.sort_values(by="rating", ascending=False)
+    
+        # Populate sidebar with sorted facilities
+        for _, row in sorted_facilities.iterrows():
+            st.sidebar.markdown(f"""
+            **{row['name']}**
+            - Address: {row['address']}
+            - Rating: {row['rating']} ⭐
+            - Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}
+            - Distance: {row.get('distance', 'N/A')} km
+            [Get Directions](https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']})
+            """)
+    else:
+        st.sidebar.warning("No facilities found nearby.")
+    
+    # Ensure facilities are stored in session state
+    # Ensure facilities are stored in session state
+    if "facilities" not in st.session_state:
+        st.session_state["facilities"] = pd.DataFrame()
+    
+    # Retrieve facilities from session state
+    facilities = st.session_state["facilities"]
+    
+    
+    # Check if facilities are empty to display map or error message
+    if facilities.empty:
+        st.error("No facilities found. Check your location or radius.")
+        st.session_state["map"] = folium.Map(location=[latitude, longitude], zoom_start=12)
+    else:
+        st.write(f"Inferred Type of Care: {len(facilities)} facilities found.")
+        m = folium.Map(location=[latitude, longitude], zoom_start=12)
+        folium.Circle(
+            location=[latitude, longitude],
+            radius=radius,
+            color="blue",
+            fill=True,
+            fill_opacity=0.4
         ).add_to(m)
-
-    # Add current location marker
-    folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(icon="info-sign", color="red")
-    ).add_to(m)
-
-    st.session_state["map"] = m
-
-if "map" in st.session_state and st.session_state["map"] is not None:
-    st_folium(st.session_state["map"], width=700, height=500)
-else:
-    default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-    folium.Marker(
-        location=[latitude, longitude],
-        popup="Current Location",
-        icon=folium.Icon(icon="info-sign", color="red")
-    ).add_to(default_map)
-    folium.Circle(
-        location=[latitude, longitude],
-        radius=radius,
-        color="blue",
-        fill=True,
-        fill_opacity=0.4
-    ).add_to(default_map)
-    st_folium(default_map, width=700, height=500)
-
-st.markdown("""
-<div style="text-align: center;">
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog" target="_blank" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
-        📝 Fill Out Feedback Form
-    </a>
-</div>
-""", unsafe_allow_html=True)
+    
+        for _, row in facilities.iterrows():
+            wheelchair_accessible = row.get('wheelchair_accessible_entrance', False)
+            # Assign a color based on ratings
+            color = "gray"  # Default color for unrated
+            if row["rating"] != "No rating" and row["rating"]:
+                if float(row["rating"]) >= 4:
+                    color = "green"
+                elif float(row["rating"]) >= 3:
+                    color = "blue"
+                elif float(row["rating"]) >= 2:
+                    color = "orange"
+                elif float(row["rating"]) >= 1:
+                    color = "yellow"
+    
+            # Generate the directions link
+            directions_link = f"https://www.google.com/maps/dir/?api=1&destination={row['latitude']},{row['longitude']}"
+    
+            # Add marker with "Get Directions" link
+            popup_content = f"""
+            <b>{row['name']}</b><br>
+            Address: {row['address']}<br>
+            Open Now: {"Open" if row['open_now'] else "Closed"}<br>
+            Medicaid Supported: {"Yes" if row["medicaid_supported"] else "No"}<br>
+            Rating: {row['rating']} ({row['user_ratings_total']} reviews)<br>
+            Wheelchair Accessible Entrance: {"Yes" if row['wheelchair_accessible_entrance'] else "No"}<br>
+            <a href="{directions_link}" target="_blank">Get Directions</a>
+            """
+            folium.Marker(
+                location=[row["latitude"], row["longitude"]],
+                popup=folium.Popup(popup_content, max_width=300),
+                icon=folium.Icon(color=color)
+            ).add_to(m)
+    
+        # Add current location marker
+        folium.Marker(
+            location=[latitude, longitude],
+            popup="Current Location",
+            icon=folium.Icon(icon="info-sign", color="red")
+        ).add_to(m)
+    
+        st.session_state["map"] = m
+    
+    if "map" in st.session_state and st.session_state["map"] is not None:
+        st_folium(st.session_state["map"], width=700, height=500)
+    else:
+        default_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+        folium.Marker(
+            location=[latitude, longitude],
+            popup="Current Location",
+            icon=folium.Icon(icon="info-sign", color="red")
+        ).add_to(default_map)
+        folium.Circle(
+            location=[latitude, longitude],
+            radius=radius,
+            color="blue",
+            fill=True,
+            fill_opacity=0.4
+        ).add_to(default_map)
+        st_folium(default_map, width=700, height=500)
+    
+    st.markdown("""
+    <div style="text-align: center;">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScgTWRrJggbHv6dXIXRIyG6vk02VIxPSlecwVfK0kg_7EESpw/viewform?usp=dialog" target="_blank" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+            📝 Fill Out Feedback Form
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
 
