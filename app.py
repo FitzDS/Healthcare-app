@@ -6,6 +6,7 @@ from streamlit_folium import st_folium
 import folium
 from openai import Client
 
+#sys.stderr = open(os.devnull, 'w')
 
 # Initialize session state for map, facilities, and search flag
 if "map" not in st.session_state:
@@ -229,6 +230,7 @@ def get_current_location():
         return g.latlng
     st.error("Unable to detect current location.")
     return [38.5449, -121.7405]
+
 st.markdown("""
 <style>
 /* Header Container */
@@ -295,53 +297,32 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-
-
 # Add legend above the map
 st.markdown("""
-<div style="
-    border: 2px solid #ddd; 
-    border-radius: 15px; 
-    padding: 20px; 
-    background: linear-gradient(135deg, #ffffff, #f9f9f9); 
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
-    margin-bottom: 20px;
-    text-align: left;">
-    <h4 style="color: #2b2e4a; text-align: center; font-family: 'Roboto', sans-serif; margin-bottom: 15px;">
-        <strong>Map Legend</strong>
-    </h4>
-    <ul style="list-style-type: none; padding: 0; font-family: 'Roboto', sans-serif; font-size: 15px; color: #333; line-height: 1.8;">
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            Current Location
+<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
+    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        <li style="margin: 5px 0;">
+            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
         </li>
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: green; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            4-5 Stars
+        <li style="margin: 5px 0;">
+            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
         </li>
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: blue; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            3-4 Stars
+        <li style="margin: 5px 0;">
+            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
         </li>
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: orange; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            2-3 Stars
+        <li style="margin: 5px 0;">
+            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
         </li>
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: yellow; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            1-2 Stars
+        <li style="margin: 5px 0;">
+            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
         </li>
-        <li style="display: flex; align-items: center; margin: 10px 0;">
-            <span style="width: 15px; height: 15px; background-color: gray; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> 
-            Unrated or 0-1 Stars
+        <li style="margin: 5px 0;">
+            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
         </li>
     </ul>
 </div>
 """, unsafe_allow_html=True)
-
-
-
-
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
@@ -406,9 +387,6 @@ elif location_query:
 # After the search has been performed, retrieve the facilities and display them
 facilities = st.session_state.get("facilities", pd.DataFrame())
 
-st.markdown("""
-</div>
-""", unsafe_allow_html=True)
 
 # Ensure facilities are stored in session state only after the search button is clicked
 if st.button("Search", key="search_button"):
@@ -563,64 +541,3 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
-st.markdown("""
-<style>
-/* Full-page gradient background */
-div[data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #2b2e4a, #4a5568);
-    padding: 50px;
-}
-
-/* Geometric shapes for visual appeal */
-div[data-testid="stAppViewContainer"]::before {
-    content: '';
-    position: absolute;
-    top: -150px;
-    left: -200px;
-    width: 500px;
-    height: 500px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    z-index: -1;
-    filter: blur(100px);
-}
-
-div[data-testid="stAppViewContainer"]::after {
-    content: '';
-    position: absolute;
-    bottom: -150px;
-    right: -200px;
-    width: 400px;
-    height: 400px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    z-index: -1;
-    filter: blur(100px);
-}
-
-/* Shift the white content box to the right */
-section.main {
-    width: 90% !important; /* Set the box width */
-    max-width: 1400px;
-    margin-left: 5%; /* Shift the box to the right */
-    padding: 0;
-}
-
-/* Style the white content box */
-div[data-testid="stVerticalBlock"] {
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-    padding: 50px;
-    width: 100%; /* Ensure the content box fills the main container */
-    text-align: left;
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-
-
-
-
