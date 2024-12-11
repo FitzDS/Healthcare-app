@@ -7,7 +7,7 @@ import folium
 from openai import Client
 from geopy.distance import geodesic
 
-sys.tracebacklimit = 1
+
 csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/providers_data_with_coordinates_threading.csv"
 
 # Read the CSV file from GitHub
@@ -294,10 +294,13 @@ if st.button("Search", key="search_button"):
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
     if show_medicaid_only:
-        if 'medicaid_supported' in facilities.columns:
+        try:
+            # Attempt to filter by 'medicaid_supported' column
             facilities = facilities[facilities['medicaid_supported']]
-        else:
+        except KeyError:
+            # If 'medicaid_supported' column is missing, show a warning message
             st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
+
 
 
 # Sidebar with sorted list of locations
