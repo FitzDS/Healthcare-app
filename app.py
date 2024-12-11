@@ -244,7 +244,7 @@ st.markdown("""
     color: white;
 }
 
-/* Moving Geometric Shapes */
+/* Static Geometric Shapes */
 .header-container::before,
 .header-container::after {
     content: '';
@@ -252,7 +252,6 @@ st.markdown("""
     border-radius: 50%;
     filter: blur(75px);
     z-index: 0;
-    animation: moveBlur 12s ease-in-out infinite;
 }
 
 .header-container::before {
@@ -261,7 +260,6 @@ st.markdown("""
     background: rgba(76, 175, 80, 0.15); /* Soft green */
     top: -50px;
     left: -50px;
-    animation-delay: 0s; /* Green glow starts immediately */
 }
 
 .header-container::after {
@@ -270,14 +268,6 @@ st.markdown("""
     background: rgba(3, 169, 244, 0.2); /* Soft blue */
     bottom: -60px;
     right: -60px;
-    animation-delay: 6s; /* Blue glow starts after 6 seconds */
-}
-
-/* Animation Keyframes */
-@keyframes moveBlur {
-    0% { transform: translate(0, 0); }
-    50% { transform: translate(30px, -30px); }
-    100% { transform: translate(-20px, 20px); }
 }
 
 /* Title Styling */
@@ -291,7 +281,7 @@ st.markdown("""
 }
 
 .header-container p {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif';
     font-weight: 300;
     font-size: 18px;
     margin-top: 10px;
@@ -305,6 +295,7 @@ st.markdown("""
     <p>Find the care you need, wherever you are.</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 # Add legend above the map
