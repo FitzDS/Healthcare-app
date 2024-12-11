@@ -563,31 +563,38 @@ else:
 
 st.markdown("""
 <style>
-/* Full App Background */
+/* App Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Subtle green gradient */
+    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Calm greenish background */
     padding: 0;
+    margin: 0;
 }
 
-/* White Content Box */
-[data-testid="stVerticalBlock"] > div {
+/* Full-Height White Box */
+.full-box {
     background-color: white;
-    border-radius: 15px;
-    padding: 20px 30px;
+    border-radius: 12px;
+    padding: 30px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
     width: 90%;
-    max-width: 800px;
+    max-width: 800px; /* Keep content centered and consistent */
 }
 
-/* Styled Button */
+/* Styled Title and Subtitle */
+.full-box h1, .full-box h2, .full-box p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
 button[kind="primary"] {
     background: linear-gradient(135deg, #43a047, #2e7d32);
     color: white;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px 20px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -598,13 +605,12 @@ button[kind="primary"]:hover {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Styled Slider */
+/* Sliders */
 [data-testid="stSlider"] {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    padding: 10px;
+    padding: 10px 0;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
