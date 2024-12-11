@@ -7,7 +7,7 @@ import folium
 from openai import Client
 from geopy.distance import geodesic
 
-
+sys.tracebacklimit = 1
 csv_url = "https://raw.githubusercontent.com/FitzDS/Healthcare-app/main/providers_data_with_coordinates_threading.csv"
 
 # Read the CSV file from GitHub
