@@ -329,8 +329,8 @@ facilities = st.session_state["facilities"]
 
 # Check if the "Show Medicaid-Supported Providers Only" checkbox is selected
 if show_medicaid_only:
-    # Only apply the filter if facilities are loaded
-    if not facilities.empty:
+    # Only apply the filter if facilities are loaded and the "medicaid_supported" column exists
+    if not facilities.empty and "medicaid_supported" in facilities.columns:
         facilities = facilities[facilities["medicaid_supported"]]
     else:
         st.warning("No facilities found. Please search for healthcare facilities first.")
