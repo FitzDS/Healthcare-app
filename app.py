@@ -307,6 +307,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# Add legend above the map
+st.markdown("""
+<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
+    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        <li style="margin: 5px 0;">
+            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
+        </li>
+        <li style="margin: 5px 0;">
+            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
+        </li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
+
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
 unit_option = st.radio("Select Unit for Radius:", options=["Meters", "Miles"], index=0)
