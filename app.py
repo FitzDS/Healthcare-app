@@ -235,7 +235,7 @@ st.markdown("""
 <style>
 /* Header Container */
 .header-container {
-    background-color: #2b2e4a;
+    background-color: #2b2e4a; /* Dark blue-gray background */
     padding: 50px;
     border-radius: 12px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
@@ -244,30 +244,33 @@ st.markdown("""
     color: white;
 }
 
-/* Geometric Shapes */
+/* Moving Geometric Shapes */
 .header-container::before,
 .header-container::after {
     content: '';
     position: absolute;
     border-radius: 50%;
     filter: blur(75px);
+    animation: moveBlur 12s infinite alternate;
     z-index: 0;
 }
 
 .header-container::before {
     width: 300px;
     height: 300px;
-    background: rgba(76, 175, 80, 0.1); /* Light green glow */
+    background: rgba(76, 175, 80, 0.15); /* Soft green */
     top: -50px;
     left: -50px;
+    animation-delay: 0s; /* Green glow moves first */
 }
 
 .header-container::after {
     width: 350px;
     height: 350px;
-    background: rgba(3, 169, 244, 0.15); /* Blue glow */
+    background: rgba(3, 169, 244, 0.2); /* Soft blue */
     bottom: -60px;
     right: -60px;
+    animation-delay: 6s; /* Blue glow moves next */
 }
 
 /* Title Styling */
@@ -288,6 +291,13 @@ st.markdown("""
     z-index: 1;
     position: relative;
 }
+
+/* Animation Keyframes */
+@keyframes moveBlur {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(20px, -20px); }
+    100% { transform: translate(-10px, 10px); }
+}
 </style>
 
 <div class="header-container">
@@ -296,33 +306,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-# Add legend above the map
-st.markdown("""
-<div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; margin-top: 10px;">
-    <h3 style="color: #4CAF50; text-align: center;">Legend</h3>
-    <ul style="list-style-type: none; padding: 0;">
-        <li style="margin: 5px 0;">
-            <span style="color: red; font-weight: bold;">⬤</span> <strong>Current Location</strong>
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: green; font-weight: bold;">⬤</span> 4-5 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: blue; font-weight: bold;">⬤</span> 3-4 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: orange; font-weight: bold;">⬤</span> 2-3 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: yellow; font-weight: bold;">⬤</span> 1-2 Stars
-        </li>
-        <li style="margin: 5px 0;">
-            <span style="color: gray; font-weight: bold;">⬤</span> Unrated or 0-1 Stars
-        </li>
-    </ul>
-</div>
-""", unsafe_allow_html=True)
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
