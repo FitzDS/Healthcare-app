@@ -297,16 +297,73 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Add legend above the map
-st.markdown(f"""### Legend
-- **Red Marker**: Current Location
-- **Rating Colors**:
-  - **Green**: 4-5 Stars
-  - **Blue**: 3-4 Stars
-  - **Orange**: 2-3 Stars
-  - **Yellow**: 1-2 Stars
-  - **Gray**: Unrated or 0-1 Stars
-""")
+st.markdown("""
+<style>
+.legend-container {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    margin-top: 20px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.legend-container h3 {
+    color: #3A405A;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.legend-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legend-container li {
+    margin: 10px 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.legend-container li span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.legend-container li:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+.color-red { background-color: red; }
+.color-green { background-color: green; }
+.color-blue { background-color: blue; }
+.color-orange { background-color: orange; }
+.color-yellow { background-color: yellow; }
+.color-gray { background-color: gray; }
+</style>
+
+<div class="legend-container">
+    <h3>Legend</h3>
+    <ul>
+        <li><span class="color-red"></span><strong>Current Location</strong></li>
+        <li><span class="color-green"></span><strong>4-5 Stars</strong></li>
+        <li><span class="color-blue"></span><strong>3-4 Stars</strong></li>
+        <li><span class="color-orange"></span><strong>2-3 Stars</strong></li>
+        <li><span class="color-yellow"></span><strong>1-2 Stars</strong></li>
+        <li><span class="color-gray"></span><strong>Unrated or 0-1 Stars</strong></li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
+
 
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
