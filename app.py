@@ -563,44 +563,34 @@ else:
 
 st.markdown("""
 <style>
-/* App Background */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #f0f4f3, #e8f5e9); /* Subtle greenish background */
-    padding: 20px; /* Add padding to avoid cramped look */
-    margin: 0;
-}
-
-/* Input Box Styling */
-input, select, textarea {
+/* Dropdown (select) Styling */
+[data-baseweb="select"] {
     background-color: white !important;
     border: 1px solid #ccc !important;
     border-radius: 8px !important;
-    padding: 10px !important;
+    padding: 5px 10px !important;
     font-family: 'Roboto', sans-serif;
     font-size: 14px !important;
     color: #333 !important;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Slider Styling */
-[data-testid="stSlider"] {
-    padding: 10px 0;
+/* Checkbox Styling */
+[data-baseweb="checkbox"] {
+    background-color: white !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Title and Section Headers */
-h1, h2, h3 {
-    color: #2e7d32;
-    text-align: center;
+/* Label Styling */
+label {
     font-family: 'Roboto', sans-serif;
-    margin-bottom: 20px;
-}
-
-/* Add Spacing Between Elements */
-.stSlider, .stButton {
-    margin: 20px 0 !important;
+    color: #333;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
