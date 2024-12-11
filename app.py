@@ -560,98 +560,53 @@ else:
 
 st.markdown("""
 <style>
-/* Full Page Background */
+/* Page Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32); /* Subtle green gradient */
-    padding: 20px;
-    color: white;
+    background: #ffffff; /* Fallback for unsupported browsers */
+    background-image: url("https://www.transparenttextures.com/patterns/white-carbon.png"), 
+                      linear-gradient(135deg, #f5f7fa, #e3eff8);
+    position: relative;
+    overflow: hidden;
 }
 
-/* General Card Style (Legend and Input Box) */
+/* Moving Geometric Shapes */
+.dynamic-bg {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 150%;
+    height: 150%;
+    background: transparent;
+    z-index: -1;
+    animation: moveShapes 10s linear infinite;
+    opacity: 0.4;
+    background: repeating-linear-gradient(
+        45deg,
+        #c6e4f2,
+        #c6e4f2 10px,
+        #e3f5fe 10px,
+        #e3f5fe 20px
+    );
+    mask-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Polygon_pattern.svg/2560px-Polygon_pattern.svg.png");
+    mask-size: cover;
+}
+
+/* Animation for Dynamic Effect */
+@keyframes moveShapes {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(10px, 10px) rotate(5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Content Box Styling */
 .card-container {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 20px 30px;
-    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    max-width: 800px; /* Keep a consistent width */
+    max-width: 800px;
     font-family: 'Roboto', sans-serif;
-}
-
-/* Legend Styling */
-.legend-container h3 {
-    color: #2e7d32;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    text-align: center;
-}
-
-.legend-container ul {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.legend-container li {
-    margin: 10px 20px;
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    color: #333;
-}
-
-.legend-container li span {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-right: 10px;
-    border-radius: 50%;
-}
-
-/* Input Section Styling */
-.input-container h3 {
-    color: #2e7d32;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-input, select, textarea {
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
-    color: #333;
-    width: 100%;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 15px;
-}
-
-.stSlider {
-    padding: 10px 0;
-}
-
-button[kind="primary"] {
-    background: linear-gradient(135deg, #43a047, #2e7d32);
-    color: white;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-button[kind="primary"]:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
 """, unsafe_allow_html=True)
