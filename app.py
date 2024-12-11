@@ -237,13 +237,13 @@ st.markdown("""
     padding: 40px; 
     border-radius: 12px; 
     border: 1px solid #ddd; 
-    text-align: center; 
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
     <h1 style="
         color: #2c3e50; 
         font-family: 'Roboto', sans-serif; 
         font-weight: 700; 
         font-size: 36px; 
+        text-align: left; 
         margin-bottom: 10px;">
         Global Healthcare Facility Locator
     </h1>
@@ -251,6 +251,7 @@ st.markdown("""
         color: #7f8c8d; 
         font-family: 'Roboto', sans-serif; 
         font-size: 18px; 
+        text-align: left; 
         margin: 0;">
         Find the care you need, anywhere in the world.
     </p>
