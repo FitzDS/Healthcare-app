@@ -290,8 +290,11 @@ if st.button("Search", key="search_button"):
 
     if filter_wheelchair_accessible:
         facilities = facilities[facilities['wheelchair_accessible_entrance'] == True]
-    if show_medicaid_only and "medicaid_supported" in facilities.columns:
-        facilities = facilities[facilities['medicaid_supported'] == True]
+    if show_medicaid_only:
+        if 'medicaid_supported' in facilities.columns:
+            facilities = facilities[facilities['medicaid_supported']]
+        else:
+            st.warning("Medicaid-supported column is missing. Please search for healthcare facilities first.")
         
     # Store the fetched facilities in session state
     st.session_state["facilities"] = facilities
