@@ -317,6 +317,7 @@ st.markdown("""
     margin-bottom: 15px;
     border-bottom: 2px solid #ddd; /* Underline the title */
     padding-bottom: 5px;
+    color: black;
 }
 
 .legend-container ul {
@@ -333,6 +334,7 @@ st.markdown("""
     align-items: center;
     border-bottom: 1px solid #eee; /* Subtle separator between items */
     padding-bottom: 8px;
+    color: black;
 }
 
 .legend-container li:last-child {
