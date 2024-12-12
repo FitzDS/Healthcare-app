@@ -43,8 +43,6 @@ CARE_TYPES = {
     "Physiotherapist": "physiotherapist",
 }
 
-
-
 # Ensure the current location marker is persistent
 if "current_location_marker" in st.session_state:
     # Access or modify the session state variable
@@ -53,7 +51,6 @@ else:
     # Initialize the session state variable if it doesn't exist
     st.session_state["current_location_marker"] = None
     current_location_marker = None
-
 
 @st.cache_data
 def classify_issue_with_openai_cached(issue_description):
@@ -114,7 +111,6 @@ def classify_issue_with_openai_cached(issue_description):
         except Exception as fallback_error:
             print(f"Error with fallback model {fallback_model}: {fallback_error}.")
             return "Error"
-
 
 def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_only=False, medicaid_data=None):
     """
@@ -205,13 +201,6 @@ def fetch_healthcare_data_google(latitude, longitude, radius, care_type, open_on
                 break
 
     return pd.DataFrame(facilities)
-
-
-
-
-
-
-
 
 def get_lat_lon_from_query(query):
     url = f"https://maps.googleapis.com/maps/api/geocode/json"
@@ -371,8 +360,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-
 location_query = st.text_input("Search by Location:")
 # Add a toggle for units
 unit_option = st.radio("Select Unit for Radius:", options=["Meters", "Miles"], index=0)
@@ -435,7 +422,6 @@ elif location_query:
 
 # After the search has been performed, retrieve the facilities and display them
 facilities = st.session_state.get("facilities", pd.DataFrame())
-
 
 def update_sidebar(facilities):
     st.sidebar.title("Nearby Locations")
@@ -502,8 +488,6 @@ except KeyError as e:
 
 
 update_sidebar(st.session_state.facilities)
-
-
 
 # Ensure facilities are stored in session state
 # Ensure facilities are stored in session state
@@ -588,9 +572,6 @@ else:
         fill_opacity=0.4
     ).add_to(default_map)
     st_folium(default_map, width=700, height=500)
-
-
-
 
 st.markdown("""
 <div style="text-align: center;">
