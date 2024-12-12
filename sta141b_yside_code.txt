@@ -1,0 +1,179 @@
+# import packages
+import pandas as pd
+from itertools import islice
+import requests
+from bs4 import BeautifulSoup
+import time
+import re
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import csv
+import os
+
+# import dataframe from csv file
+zipcodes_df = pd.read_csv("C:/Users/yukar/Downloads/zip_code_database.csv") 
+
+# only consider standard zip codes
+zipcodes_df = zipcodes_df[zipcodes_df['type'] == 'STANDARD']
+
+# only look at california zip codes
+ca_zipcodes_df = zipcodes_df[zipcodes_df['state'] == 'CA']
+
+# list of zip codes as strings
+ca_zip_codes = zipcodes_df['zip'].astype(str).tolist()  
+
+def batch(iterable, batch_size):
+    '''
+    Takes iterable (data that will be split) and the desired size of each batch
+    Then divides the data into batches of that size 
+    '''
+
+    # create iterator
+    it = iter(iterable)
+    while True:
+        # slices in desired batch size or less if total left is less than batch size
+        chunk = list(islice(it, batch_size))
+        if not chunk:
+            break
+        # similar to return, but more memory efficient
+        yield chunk
+
+# list of zip codes batches in groups of 50
+ca_zip_batches = list(batch(ca_zip_codes, 50))
+
+def scrape_healthgrades_zip(zip_code):
+    '''
+    Takes zip code as a string and uses it to find health provider information in that zip code
+    that take medicaid insurance
+    Returns a dictionary with provider name, speciality, and office address
+    '''
+
+    # set up chrome driver
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  
+    service = Service("C:/Users/yukar/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe")
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    # base url where "what" refers to what health insurance and "where" is the zip code
+    base_url = f"https://www.healthgrades.com/usearch?what=medicaid&where={zip_code}"
+    driver.get(base_url)
+
+    providers = []
+
+
+    time.sleep(1)
+
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+    # finds all the provider cards on the page
+    provider_cards = soup.find_all('div', class_='D3oATTFGKHQDxyDR MUU7qPwXH8scbrT7 PQQF2bnkw2gDe8Bm')
+        
+    if provider_cards:
+        for card in provider_cards:
+            try:
+                # extract the provider's name
+                name_tag = card.find('h3', class_='SQgRqCj5Lmsc8jAm hWXwADpiAgQW_vN2')
+                name = name_tag.text.strip() if name_tag else 'N/A'
+                
+                # extract the provider's specialty
+                specialty_tag = card.find('div', class_='ciXWR_F96QIbVTnf')
+                if specialty_tag:
+                    specialty = specialty_tag.text.strip()
+                    specialty = specialty.replace('Specialty: ', '')
+                else:
+                    specialty = 'N/A'
+                
+                # extract the provider's address
+                address_tag = card.find('address', class_='efB6RomtY4gvWNmF')
+                if address_tag:
+                    street_address = address_tag.find('span', {'data-qa-target': 'location-info-address__address'}).text.strip()
+                    city_state_zip = address_tag.find('span', {'data-qa-target': 'location-info-address__city-state'}).text.strip()
+                    full_address = f"{street_address}, {city_state_zip}"
+                    
+                    # extract the zip code from the full address 
+                    zip_match = re.search(r'\d{5}(?:-\d{4})?', full_address)
+                    provider_zip = zip_match.group(0) if zip_match else None
+                    
+                else:
+                    full_address = 'N/A'
+                    provider_zip = None
+
+                # create dictionary with provider information if the provider's address is in the zip code we searched for
+                if provider_zip == zip_code:
+                    providers.append({
+                        'ZIP': zip_code,
+                        'Name': name,
+                        'Specialty': specialty,
+                        'Address': full_address
+                    })
+
+            except Exception as e:
+                print(f"Error parsing provider card: {e}")
+                continue
+
+    driver.quit()
+    return providers
+
+def scrape_healthgrades_batch(zip_batches):
+    '''
+    Takes list of zip code batches
+    Returns a list with all the providers and their information
+    '''
+
+    all_providers = []
+
+    for batch_num, zip_batch in enumerate(zip_batches, 1):
+        for zip_code in zip_batch:
+            providers = scrape_healthgrades_zip(zip_code)
+            if providers:
+                all_providers.extend(providers)
+            time.sleep(1)
+
+    return all_providers
+
+california_providers = scrape_healthgrades_batch(ca_zip_batches)
+
+with open("all_providers.csv", mode="w", newline='') as file:
+    writer = csv.DictWriter(file, fieldnames=["ZIP", "Name", "Specialty", "Address"])
+    writer.writeheader()
+    writer.writerows(california_providers)
+
+providers_df = pd.DataFrame(california_providers)
+output_folder = "C:/Users/yukar/Downloads/STA141B Project"
+output_file = os.path.join(output_folder, "providers_data.csv")
+providers_df.to_csv(output_file, index=False)
+
+# only look at oregon zip codes
+or_zipcodes_df = zipcodes_df[zipcodes_df['state'] == 'OR']
+
+# list of zip codes as strings
+or_zip_codes = or_zipcodes_df['zip'].astype(str).tolist()  
+
+# list of zip codes batches in groups of 50
+or_zip_batches = list(batch(or_zip_codes, 50))
+
+oregon_providers = scrape_healthgrades_batch(or_zip_batches)
+
+oregon_providers_df = pd.DataFrame(oregon_providers)
+file_exists = os.path.isfile(output_file)
+oregon_providers_df.to_csv(output_file, mode='a', index=False, header=not file_exists)
+
+# only look at washington zip codes
+wa_zipcodes_df = zipcodes_df[zipcodes_df['state'] == 'WA']
+
+# list of zip codes as strings
+wa_zip_codes = wa_zipcodes_df['zip'].astype(str).tolist()  
+
+# list of zip codes batches in groups of 50
+wa_zip_batches = list(batch(or_zip_codes, 50))
+
+washington_providers = scrape_healthgrades_batch(wa_zip_batches)
+
+washington_providers_df = pd.DataFrame(washington_providers)
+file_exists = os.path.isfile(output_file)
+washington_providers_df.to_csv(output_file, mode='a', index=False, header=not file_exists)
